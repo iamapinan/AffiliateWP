@@ -54,9 +54,9 @@ class REST extends Controller {
 	 * @since 1.9
 	 * @access public
 	 *
-	 * @return array|\WP_Error Array of affiliates, otherwise WP_Error.
+	 * @return \WP_REST_Response|\WP_Error Affiliates response object or \WP_Error object if not found.
 	 */
-	public function ep_get_affiliates() {
+	public function ep_get_affiliates( $args ) {
 		$affiliates = affiliate_wp()->affiliates->get_affiliates( array(
 			'number' => -1,
 			'order'  => 'ASC'
@@ -72,7 +72,7 @@ class REST extends Controller {
 
 		$affiliates = array_map( array( $this, 'process_for_output' ), $affiliates );
 
-		return $affiliates;
+		return rest_ensure_response( $affiliates );
 	}
 
 	/**
@@ -82,7 +82,7 @@ class REST extends Controller {
 	 * @access public
 	 *
 	 * @param \WP_REST_Request $args Request arguments.
-	 * @return \AffWP\Affiliate|\WP_Error Affiliate object or \WP_Error object if not found.
+	 * @return \WP_REST_Response|\WP_Error Affiliate object response or \WP_Error object if not found.
 	 */
 	public function ep_affiliate_id( $args ) {
 		if ( ! $affiliate = \affwp_get_affiliate( $args['id'] ) ) {
@@ -96,7 +96,9 @@ class REST extends Controller {
 		$user = isset( $args['user'] ) && true == (bool) $args['user'];
 
 		// Populate extra fields and return.
-		return $this->process_for_output( $affiliate, $user );
+		$affiliate = $this->process_for_output( $affiliate, $user );
+
+		return rest_ensure_response( $affiliate );
 	}
 
 	/**
