@@ -25,6 +25,10 @@ class REST extends Controller {
 			'methods' => $wp_rest_server::READABLE,
 			'callback' => array( $this, 'ep_get_referrals' ),
 			'args' => array(
+				/*
+				 * Pass top-level args as query vars:
+				 * /referrals/?status=pending&order=desc
+				 */
 				'number' => array(
 					'sanitize_callback' => 'absint',
 					'validate_callback' => 'is_numeric',
@@ -73,6 +77,11 @@ class REST extends Controller {
 						return rest_parse_date( $param );
 					}
 				),
+
+				/*
+				 * Pass any valid get_referrals() args via filter:
+				 * /referrals/?filter[status]=pending&filter[order]=desc
+				 */
 				'filter' => array()
 			)
 		) );
