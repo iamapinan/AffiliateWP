@@ -19,7 +19,7 @@ namespace AffWP;
  * @see affwp_get_affiliate()
  *
  * @property-read int     $ID   Alias for `$affiliate_id`.
- * @property-read WP_User $user User object.
+ * @property      WP_User $user User object.
  */
 final class Affiliate extends Object {
 
@@ -163,7 +163,7 @@ final class Affiliate extends Object {
 	 */
 	public function __get( $key ) {
 		if ( 'user' === $key ) {
-			return $this->build_the_user_object();
+			return $this->get_user();
 		}
 
 		return parent::__get( $key );
@@ -173,11 +173,11 @@ final class Affiliate extends Object {
 	 * Builds the lazy-loaded user object with first and last name fields.
 	 *
 	 * @since 1.9
-	 * @access private
+	 * @access public
 	 *
 	 * @return false|\WP_User Built user object or false if it doesn't exist.
 	 */
-	private function build_the_user_object() {
+	public function get_user() {
 		$user = get_user_by( 'id', $this->user_id );
 
 		if ( $user ) {

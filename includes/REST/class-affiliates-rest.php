@@ -115,7 +115,7 @@ class REST extends Controller {
 	 */
 	protected function process_for_output( $affiliate, $user = false ) {
 		if ( false !== $user ) {
-			$affiliate->extra['user'] = $affiliate->user;
+			$affiliate->user = $affiliate->get_user();
 		}
 
 		return $affiliate;
