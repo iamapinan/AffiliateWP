@@ -25,12 +25,55 @@ class REST extends Controller {
 			'methods' => $wp_rest_server::READABLE,
 			'callback' => array( $this, 'ep_get_referrals' ),
 			'args' => array(
+				'number' => array(
+					'sanitize_callback' => 'absint',
+					'validate_callback' => 'is_numeric',
+				),
+				'offset' => array(
+					'sanitize_callback' => 'absint',
+					'validate_callback' => 'is_numeric',
+				),
+				'referral_id' => array(
+					'sanitize_callback' => 'absint',
+					'validate_callback' => 'is_numeric',
+				),
+				'affiliate_id' => array(
+					'sanitize_callback' => 'absint',
+					'validate_callback' => 'is_numeric',
+				),
+				'reference' => array(
+					'sanitize_callback' => 'sanitize_text_field',
+				),
+				'context' => array(
+					'sanitize_callback' => 'sanitize_text_field',
+				),
+				'campaign' => array(
+					'sanitize_callback' => 'sanitize_text_field',
+				),
+				'status' => array(
+					'validate_callback' => function( $param, $request, $key ) {
+						return in_array( $param, array( 'paid', 'unpaid', 'pending', 'rejected' ) );
+					},
+				),
+				'orderby' => array(
+					'validate_callback' => function( $param, $request, $key ) {
+						return array_key_exists( $param, affiliate_wp()->referrals->get_columns() );
+					}
+				),
 				'order' => array(
-					'required' => false,
 					'validate_callback' => function( $param, $request, $key ) {
 						return in_array( strtoupper( $param ), array( 'ASC', 'DESC' ) );
 					}
-				)
+				),
+				'search' => array(
+					'sanitize_callback' => 'sanitize_text_field'
+				),
+				'date' => array(
+					'validate_callback' => function( $param, $request, $key ) {
+						return rest_parse_date( $param );
+					}
+				),
+				'filter' => array()
 			)
 		) );
 
@@ -58,21 +101,39 @@ class REST extends Controller {
 	 * @access public
 	 *
 	 * @param \WP_REST_Request $request Request arguments.
-	 * @return array|\WP_Error Array of referrals, otherwise WP_Error.
+	 * @return \WP_REST_Response|\WP_Error Referrals query response, otherwise \WP_Error.
 	 */
 	public function ep_get_referrals( $request ) {
-		$defaults = array(
-			'number' => -1,
-			'order'  => 'ASC'
-		);
 
 		$args = array();
 
-		if ( isset( $request['order'] ) ) {
-			$args['order'] = $request['order'];
+		$args['number']       = isset( $request['number'] ) ? $request['number'] : -1;
+		$args['offset']       = $request['offset'];
+		$args['referral_id']  = $request['referral_id'];
+		$args['affiliate_id'] = $request['affiliate_id'];
+		$args['reference']    = $request['reference'];
+		$args['context']      = $request['context'];
+		$args['campaign']     = $request['campaign'];
+		$args['status']       = $request['status'];
+		$args['orderby']      = $request['orderby'];
+		$args['order']        = isset( $request['order'] ) ? $request['order'] : 'ASC';
+		$args['search']       = $request['search'];
+		$args['date']         = $request['date'];
+
+		if ( is_array( $request['filter'] ) ) {
+			$args = array_merge( $args, $request['filter'] );
+			unset( $request['filter'] );
 		}
 
-		$args = wp_parse_args( $args, $defaults );
+		/**
+		 * Filters the query arguments used to retrieve referrals in a REST request.
+		 *
+		 * @since 1.9
+		 *
+		 * @param array            $args    Arguments.
+		 * @param \WP_REST_Request $request Request.
+		 */
+		$args = apply_filters( 'affwp_rest_referrals_query_args', $args, $request );
 
 		$referrals = affiliate_wp()->referrals->get_referrals( $args );
 
@@ -84,7 +145,7 @@ class REST extends Controller {
 			);
 		}
 
-		return $referrals;
+		return rest_ensure_response( $referrals );
 	}
 
 	/**
