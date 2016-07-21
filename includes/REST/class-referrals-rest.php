@@ -28,7 +28,7 @@ class REST extends Controller {
 				'order' => array(
 					'required' => false,
 					'validate_callback' => function( $param, $request, $key ) {
-						return in_array( $param, array( 'ASC', 'DESC' ) );
+						return in_array( strtoupper( $param ), array( 'ASC', 'DESC' ) );
 					}
 				)
 			)
