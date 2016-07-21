@@ -23,7 +23,15 @@ class REST extends Controller {
 	public function register_routes( $wp_rest_server ) {
 		register_rest_route( $this->namespace, '/referrals/', array(
 			'methods' => $wp_rest_server::READABLE,
-			'callback' => array( $this, 'ep_get_referrals' )
+			'callback' => array( $this, 'ep_get_referrals' ),
+			'args' => array(
+				'order' => array(
+					'required' => false,
+					'validate_callback' => function( $param, $request, $key ) {
+						return in_array( $param, array( 'ASC', 'DESC' ) );
+					}
+				)
+			)
 		) );
 
 		register_rest_route( $this->namespace, '/referrals/(?P<id>\d+)', array(
@@ -49,13 +57,24 @@ class REST extends Controller {
 	 * @since 1.9
 	 * @access public
 	 *
+	 * @param \WP_REST_Request $request Request arguments.
 	 * @return array|\WP_Error Array of referrals, otherwise WP_Error.
 	 */
-	public function ep_get_referrals() {
-		$referrals = affiliate_wp()->referrals->get_referrals( array(
+	public function ep_get_referrals( $request ) {
+		$defaults = array(
 			'number' => -1,
 			'order'  => 'ASC'
-		) );
+		);
+
+		$args = array();
+
+		if ( isset( $request['order'] ) ) {
+			$args['order'] = $request['order'];
+		}
+
+		$args = wp_parse_args( $args, $defaults );
+
+		$referrals = affiliate_wp()->referrals->get_referrals( $args );
 
 		if ( empty( $referrals ) ) {
 			return new \WP_Error(
