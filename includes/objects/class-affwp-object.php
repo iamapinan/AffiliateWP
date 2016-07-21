@@ -28,18 +28,6 @@ abstract class Object {
 	protected $filled = null;
 
 	/**
-	 * Object group.
-	 *
-	 * Should be initialized in extending class versions of get_instance().
-	 *
-	 * @since 1.9
-	 * @access public
-	 * @static
-	 * @var string
-	 */
-	public static $object_group;
-
-	/**
 	 * Retrieves the object instance.
 	 *
 	 * @since 1.9
@@ -54,15 +42,14 @@ abstract class Object {
 			return false;
 		}
 
-		$Sub_Class    = get_called_class();
-		$cache_key    = self::get_cache_key( $object_id );
-		$cache_group  = $Sub_Class::$object_type;
-		$object_group = $Sub_Class::$object_group;
+		$Sub_Class   = get_called_class();
+		$cache_key   = self::get_cache_key( $object_id );
+		$cache_group = static::$object_type;
 
 		$_object = wp_cache_get( $cache_key, $cache_group );
 
 		if ( false === $_object ) {
-			$_object = affiliate_wp()->{$object_group}->get( $object_id );
+			$_object = affiliate_wp()->{static::$db_group}->get( $object_id );
 
 			if ( ! $_object ) {
 				return false;
@@ -91,9 +78,7 @@ abstract class Object {
 	 * @return string Cache key for the object type and ID.
 	 */
 	public static function get_cache_key( $object_id ) {
-		$Sub_Class = get_called_class();
-
-		return md5( $Sub_Class::$cache_token . ':' . $object_id );
+		return md5( static::$cache_token . ':' . $object_id );
 	}
 
 	/**
@@ -120,12 +105,12 @@ abstract class Object {
 	 */
 	public function __get( $key ) {
 		if ( 'ID' === $key ) {
-			$Sub_Class    = get_called_class();
-			$object_group = $Sub_Class::$object_group;
-			$primary_key  = affiliate_wp()->{$object_group}->primary_key;
+			$primary_key  = affiliate_wp()->{static::$db_group}->primary_key;
 
 			return $this->{$primary_key};
-		} elseif ( isset( $this->{$key} ) ) {
+		}
+
+		if ( isset( $this->{$key} ) ) {
 			return $this->{$key};
 		}
 	}
@@ -148,26 +133,34 @@ abstract class Object {
 	/**
 	 * Sets an object property value and optionally save.
 	 *
+	 * @internal Note: Checking isset() on $this->{$key} is missing here because
+	 *           this method is also used directly by __set() which is leveraged for
+	 *           magic properties.
+	 *
 	 * @since 1.9
 	 * @access public
 	 *
 	 * @param string $key   Property name.
 	 * @param mixed  $value Property value.
 	 * @param bool   $save  Optional. Whether to save the new value in the database.
-	 * @return int|false The object ID on success, false otherwise.
+	 * @return int|false True if the value was set. If `$save` is true, true if the save was successful.
+	 *                   False if `$save` is true and the save was unsuccessful. false otherwise.
 	 */
 	public function set( $key, $value, $save = false ) {
-		if ( ! isset( $key ) ) {
-			return false;
-		}
-
 		$this->$key = static::sanitize_field( $key, $value );
 
 		if ( true === $save ) {
+			// Only real properties can be saved.
+			$keys = array_keys( get_class_vars( get_called_class() ) );
+
+			if ( ! in_array( $key, $keys ) ) {
+				return false;
+			}
+
 			return $this->save();
-		} else {
-			return $this->ID;
 		}
+
+		return true;
 	}
 
 	/**
@@ -176,20 +169,31 @@ abstract class Object {
 	 * @since 1.9
 	 * @access public
 	 *
-	 * @return int|false The object ID on success, false otherwise.
+	 * @return bool True on success, false on failure.
 	 */
 	public function save() {
-		$Sub_Class    = get_called_class();
-		$object_type  = $Sub_Class::$object_type;
-		$object_group = $Sub_Class::$object_group;
+		$object_type = static::$object_type;
 
-		$updated = affiliate_wp()->{$object_group}->update( $this->ID, $this->to_array(), '', $object_type );
+		switch ( $object_type ) {
+			case 'referral':
+				$updated = affiliate_wp()->referrals->update_referral( $this->ID, $this->to_array() );
+				break;
+
+			case 'visit':
+				$updated = affiliate_wp()->visits->update_visit( $this->ID, $this->to_array() );
+				break;
+
+			default:
+				// Affiliates and Creatives have update() methods.
+				$updated = affiliate_wp()->{static::$db_group}->update( $this->ID, $this->to_array(), '', $object_type );
+				break;
+		}
 
 		if ( $updated ) {
-			return $this->ID;
-		} else {
-			return false;
+			return true;
 		}
+
+		return false;
 	}
 
 	/**
