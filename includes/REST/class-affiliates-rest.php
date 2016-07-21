@@ -63,14 +63,14 @@ class REST extends Controller {
 		) );
 
 		if ( empty( $affiliates ) ) {
-			return new \WP_Error(
+			$affiliates = new \WP_Error(
 				'no_affiliates',
 				'No affiliates were found.',
 				array( 'status' => 404 )
 			);
+		} else {
+			$affiliates = array_map( array( $this, 'process_for_output' ), $affiliates );
 		}
-
-		$affiliates = array_map( array( $this, 'process_for_output' ), $affiliates );
 
 		return rest_ensure_response( $affiliates );
 	}
@@ -86,17 +86,17 @@ class REST extends Controller {
 	 */
 	public function ep_affiliate_id( $args ) {
 		if ( ! $affiliate = \affwp_get_affiliate( $args['id'] ) ) {
-			return new \WP_Error(
+			$affiliate = new \WP_Error(
 				'invalid_affiliate_id',
 				'Invalid affiliate ID',
 				array( 'status' => 404 )
 			);
+		} else {
+			$user = isset( $args['user'] ) && true == (bool) $args['user'];
+
+			// Populate extra fields and return.
+			$affiliate = $this->process_for_output( $affiliate, $user );
 		}
-
-		$user = isset( $args['user'] ) && true == (bool) $args['user'];
-
-		// Populate extra fields and return.
-		$affiliate = $this->process_for_output( $affiliate, $user );
 
 		return rest_ensure_response( $affiliate );
 	}
