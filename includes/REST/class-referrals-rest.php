@@ -159,7 +159,7 @@ class REST extends Controller {
 		$referrals = affiliate_wp()->referrals->get_referrals( $args );
 
 		if ( empty( $referrals ) ) {
-			return new \WP_Error(
+			$referrals = new \WP_Error(
 				'no_referrals',
 				'No referrals were found.',
 				array( 'status' => 404 )
@@ -180,7 +180,7 @@ class REST extends Controller {
 	 */
 	public function ep_referral_id( $args ) {
 		if ( ! $referral = \affwp_get_referral( $args['id'] ) ) {
-			return new \WP_Error(
+			$referral = new \WP_Error(
 				'invalid_referral_id',
 				'Invalid referral ID',
 				array( 'status' => 404 )
