@@ -23,7 +23,30 @@ class REST extends Controller {
 	public function register_routes( $wp_rest_server ) {
 		register_rest_route( $this->namespace, '/creatives/', array(
 			'methods' => $wp_rest_server::READABLE,
-			'callback' => array( $this, 'ep_get_creatives' )
+			'callback' => array( $this, 'ep_get_creatives' ),
+			'args' => array(
+				/*
+				 * Pass top-level args as query vars:
+				 * /creatives/?status=inactive&order=desc
+				 */
+				'number' => array(
+					'description'       => __( 'The number of creatives to query for. Use -1 for all.', 'affiliate-wp' ),
+					'sanitize_callback' => 'absint',
+					'validate_callback' => 'is_numeric',
+				),
+				'order' => array(
+					'description'       => __( 'How to order results. Accepts ASC (ascending) or DESC (descending).', 'affiliate-wp' ),
+					'validate_callback' => function( $param, $request, $key ) {
+						return in_array( strtoupper( $param ), array( 'ASC', 'DESC' ) );
+					}
+				),
+
+				/*
+				 * Pass any valid get_creatives() args via filter:
+				 * /creatives/?filter[status]=inactive&filter[order]=desc
+				 */
+				'filter' => array()
+			)
 		) );
 
 		register_rest_route( $this->namespace, '/creatives/(?P<id>\d+)', array(

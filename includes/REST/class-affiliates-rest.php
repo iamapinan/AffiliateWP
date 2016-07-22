@@ -23,7 +23,30 @@ class REST extends Controller {
 	public function register_routes( $wp_rest_server ) {
 		register_rest_route( $this->namespace, '/affiliates/', array(
 			'methods' => $wp_rest_server::READABLE,
-			'callback' => array( $this, 'ep_get_affiliates' )
+			'callback' => array( $this, 'ep_get_affiliates' ),
+			'args' => array(
+				/*
+				 * Pass top-level args as query vars:
+				 * /affiliates/?status=pending&order=desc
+				 */
+				'number' => array(
+					'description'       => __( 'The number of affiliates to query for. Use -1 for all.', 'affiliate-wp' ),
+					'sanitize_callback' => 'absint',
+					'validate_callback' => 'is_numeric',
+				),
+				'order' => array(
+					'description'       => __( 'How to order results. Accepts ASC (ascending) or DESC (descending).', 'affiliate-wp' ),
+					'validate_callback' => function( $param, $request, $key ) {
+						return in_array( strtoupper( $param ), array( 'ASC', 'DESC' ) );
+					}
+				),
+
+				/*
+				 * Pass any valid get_creatives() args via filter:
+				 * /affiliates/?filter[status]=pending&filter[order]=desc
+				 */
+				'filter' => array()
+			)
 		) );
 
 		register_rest_route( $this->namespace, '/affiliates/(?P<id>\d+)', array(
