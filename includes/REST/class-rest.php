@@ -60,6 +60,6 @@ abstract class Controller {
 				return $object;
 			}, $response );
 		}
-		return $this->rest_ensure_response( $response );
+		return rest_ensure_response( $response );
 	}
 }
