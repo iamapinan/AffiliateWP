@@ -30,49 +30,61 @@ class REST extends Controller {
 				 * /referrals/?status=pending&order=desc
 				 */
 				'number' => array(
+					'description'       => __( 'The number of referrals to query for. Use -1 for all.', 'affiliate-wp' ),
 					'sanitize_callback' => 'absint',
 					'validate_callback' => 'is_numeric',
 				),
 				'offset' => array(
+					'description'       => __( 'The number of referrals to offset in the query.', 'affiliate-wp' ),
 					'sanitize_callback' => 'absint',
 					'validate_callback' => 'is_numeric',
 				),
 				'referral_id' => array(
+					'description'       => __( 'The referral ID or array of IDs to query for.', 'affiliate-wp' ),
 					'sanitize_callback' => 'absint',
 					'validate_callback' => 'is_numeric',
 				),
 				'affiliate_id' => array(
+					'description'       => __( 'The affiliate ID or array of IDs to query for.', 'affiliate-wp' ),
 					'sanitize_callback' => 'absint',
 					'validate_callback' => 'is_numeric',
 				),
 				'reference' => array(
+					'description'       => __( 'Reference information (product ID) for the referral.', 'affiliate-wp' ),
 					'sanitize_callback' => 'sanitize_text_field',
 				),
 				'context' => array(
+					'description'       => __( 'The context under which the referral was created (integration).', 'affiliate-wp' ),
 					'sanitize_callback' => 'sanitize_text_field',
 				),
 				'campaign' => array(
+					'description'       => __( 'The associated campaign.', 'affiliate-wp' ),
 					'sanitize_callback' => 'sanitize_text_field',
 				),
 				'status' => array(
+					'description'       => __( 'The referral status or array of statuses.', 'affiliate-wp' ),
 					'validate_callback' => function( $param, $request, $key ) {
 						return in_array( $param, array( 'paid', 'unpaid', 'pending', 'rejected' ) );
 					},
 				),
 				'orderby' => array(
+					'description'       => __( 'Referrals table column to order by.', 'affiliate-wp' ),
 					'validate_callback' => function( $param, $request, $key ) {
 						return array_key_exists( $param, affiliate_wp()->referrals->get_columns() );
 					}
 				),
 				'order' => array(
+					'description'       => __( 'How to order results. Accepts ASC (ascending) or DESC (descending).', 'affiliate-wp' ),
 					'validate_callback' => function( $param, $request, $key ) {
 						return in_array( strtoupper( $param ), array( 'ASC', 'DESC' ) );
 					}
 				),
 				'search' => array(
+					'description'       => __( 'The search string to query for referrals with.', 'affiliate-wp' ),
 					'sanitize_callback' => 'sanitize_text_field'
 				),
 				'date' => array(
+					'description'       => __( 'The date array or string to query referrals within.', 'affiliate-wp' ),
 					'validate_callback' => function( $param, $request, $key ) {
 						return rest_parse_date( $param );
 					}
