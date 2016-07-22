@@ -65,7 +65,7 @@ class REST extends Controller {
 			);
 		}
 
-		return rest_ensure_response( $visits );
+		return $this->response( $visits );
 	}
 
 	/**
@@ -86,7 +86,7 @@ class REST extends Controller {
 			);
 		}
 
-		return rest_ensure_response( $visit );
+		return $this->response( $visit );
 	}
 
 }

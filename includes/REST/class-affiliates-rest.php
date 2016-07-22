@@ -72,7 +72,7 @@ class REST extends Controller {
 			$affiliates = array_map( array( $this, 'process_for_output' ), $affiliates );
 		}
 
-		return rest_ensure_response( $affiliates );
+		return $this->response( $affiliates );
 	}
 
 	/**
@@ -98,7 +98,7 @@ class REST extends Controller {
 			$affiliate = $this->process_for_output( $affiliate, $user );
 		}
 
-		return rest_ensure_response( $affiliate );
+		return $this->response( $affiliate );
 	}
 
 	/**

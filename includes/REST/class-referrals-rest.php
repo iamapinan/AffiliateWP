@@ -166,7 +166,7 @@ class REST extends Controller {
 			);
 		}
 
-		return rest_ensure_response( $referrals );
+		return $this->response( $referrals );
 	}
 
 	/**
@@ -176,7 +176,7 @@ class REST extends Controller {
 	 * @access public
 	 *
 	 * @param \WP_REST_Request $args Request arguments.
-	 * @return \AffWP\Referral|\WP_Error Referral object or \WP_Error object if not found.
+	 * @return \WP_REST_Response|\WP_Error Response object or \WP_Error object if not found.
 	 */
 	public function ep_referral_id( $args ) {
 		if ( ! $referral = \affwp_get_referral( $args['id'] ) ) {
@@ -187,7 +187,7 @@ class REST extends Controller {
 			);
 		}
 
-		return $referral;
+		return $this->response( $referral );
 	}
 
 }

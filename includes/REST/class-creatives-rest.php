@@ -65,7 +65,7 @@ class REST extends Controller {
 			);
 		}
 
-		return rest_ensure_response( $creatives );
+		return $this->response( $creatives );
 	}
 
 	/**
@@ -86,7 +86,7 @@ class REST extends Controller {
 			);
 		}
 
-		return rest_ensure_response( $creative );
+		return $this->response( $creative );
 	}
 
 }
