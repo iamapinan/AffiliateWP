@@ -58,14 +58,14 @@ class REST extends Controller {
 		) );
 
 		if ( empty( $creatives ) ) {
-			return new \WP_Error(
+			$creatives = new \WP_Error(
 				'no_creatives',
 				'No creatives were found.',
 				array( 'status' => 404 )
 			);
 		}
 
-		return $creatives;
+		return rest_ensure_response( $creatives );
 	}
 
 	/**
@@ -79,14 +79,14 @@ class REST extends Controller {
 	 */
 	public function ep_creative_id( $args ) {
 		if ( ! $creative = \affwp_get_creative( $args['id'] ) ) {
-			return new \WP_Error(
+			$creative = new \WP_Error(
 				'invalid_creative_id',
 				'Invalid creative ID',
 				array( 'status' => 404 )
 			);
 		}
 
-		return $creative;
+		return rest_ensure_response( $creative );
 	}
 
 }

@@ -58,14 +58,14 @@ class REST extends Controller {
 		) );
 
 		if ( empty( $visits ) ) {
-			return new \WP_Error(
+			$visits = new \WP_Error(
 				'no_visits',
 				'No visits were found.',
 				array( 'status' => 404 )
 			);
 		}
 
-		return $visits;
+		return rest_ensure_response( $visits );
 	}
 
 	/**
@@ -79,14 +79,14 @@ class REST extends Controller {
 	 */
 	public function ep_visit_id( $args ) {
 		if ( ! $visit = \affwp_get_visit( $args['id'] ) ) {
-			return new \WP_Error(
+			$visit = new \WP_Error(
 				'invalid_visit_id',
 				'Invalid visit ID',
 				array( 'status' => 404 )
 			);
 		}
 
-		return $visit;
+		return rest_ensure_response( $visit );
 	}
 
 }
