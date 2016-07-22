@@ -49,13 +49,32 @@ class REST extends Controller {
 	 * @since 1.9
 	 * @access public
 	 *
+	 * @param \WP_REST_Request $request Request arguments.
 	 * @return array|\WP_Error Array of visits, otherwise WP_Error.
 	 */
-	public function ep_get_visits() {
-		$visits = affiliate_wp()->visits->get_visits( array(
-			'number' => -1,
-			'order'  => 'ASC'
-		) );
+	public function ep_get_visits( $request ) {
+
+		$args = array();
+
+		$args['number'] = isset( $request['number'] ) ? $request['number'] : -1;
+		$args['order']  = isset( $request['order'] ) ? $request['order'] : 'ASC';
+
+		if ( is_array( $request['filter'] ) ) {
+			$args = array_merge( $args, $request['filter'] );
+			unset( $request['filter'] );
+		}
+
+		/**
+		 * Filters the query arguments used to retrieve visits in a REST request.
+		 *
+		 * @since 1.9
+		 *
+		 * @param array            $args    Arguments.
+		 * @param \WP_REST_Request $request Request.
+		 */
+		$args = apply_filters( 'affwp_rest_visits_query_args', $args, $request );
+
+		$visits = affiliate_wp()->visits->get_visits( $args );
 
 		if ( empty( $visits ) ) {
 			$visits = new \WP_Error(

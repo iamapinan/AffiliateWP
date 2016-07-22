@@ -52,10 +52,28 @@ class REST extends Controller {
 	 * @return array|\WP_Error Array of creatives, otherwise WP_Error.
 	 */
 	public function ep_get_creatives() {
-		$creatives = affiliate_wp()->creatives->get_creatives( array(
-			'number' => -1,
-			'order'  => 'ASC'
-		) );
+
+		$args = array();
+
+		$args['number'] = isset( $request['number'] ) ? $request['number'] : -1;
+		$args['order']  = isset( $request['order'] ) ? $request['order'] : 'ASC';
+
+		if ( is_array( $request['filter'] ) ) {
+			$args = array_merge( $args, $request['filter'] );
+			unset( $request['filter'] );
+		}
+
+		/**
+		 * Filters the query arguments used to retrieve creatives in a REST request.
+		 *
+		 * @since 1.9
+		 *
+		 * @param array            $args    Arguments.
+		 * @param \WP_REST_Request $request Request.
+		 */
+		$args = apply_filters( 'affwp_rest_creatives_query_args', $args, $request );
+
+		$creatives = affiliate_wp()->creatives->get_creatives( $args );
 
 		if ( empty( $creatives ) ) {
 			$creatives = new \WP_Error(
