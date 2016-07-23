@@ -7,7 +7,7 @@ namespace AffWP\REST;
  * @since 1.9
  * @abstract
  */
-abstract class Controller extends \WP_REST_Controller {
+abstract class Controller {
 
 	/**
 	 * AffWP REST namespace.
@@ -17,6 +17,17 @@ abstract class Controller extends \WP_REST_Controller {
 	 * @var string
 	 */
 	protected $namespace = 'affwp/v1';
+
+	/**
+	 * The base of this controller's route.
+	 *
+	 * Should be defined and used by subclasses.
+	 *
+	 * @since 1.9
+	 * @access protected
+	 * @var string
+	 */
+	protected $rest_base;
 
 	/**
 	 * Constructor.
@@ -48,5 +59,74 @@ abstract class Controller extends \WP_REST_Controller {
 			}, $response );
 		}
 		return rest_ensure_response( $response );
+	}
+
+	/**
+	 * Retrieves the query parameters for collections.
+	 *
+	 * @since 1.9
+	 * @access public
+	 *
+	 * @return array Collection parameters.
+	 */
+	public function get_collection_params() {
+		return array(
+			'context'                => $this->get_context_param(),
+			'page'                   => array(
+				'description'        => __( 'Current page of the collection.' ),
+				'type'               => 'integer',
+				'default'            => 1,
+				'sanitize_callback'  => 'absint',
+				'validate_callback'  => 'rest_validate_request_arg',
+				'minimum'            => 1,
+			),
+			'per_page'               => array(
+				'description'        => __( 'Maximum number of items to be returned in result set.' ),
+				'type'               => 'integer',
+				'default'            => 10,
+				'minimum'            => 1,
+				'maximum'            => 100,
+				'sanitize_callback'  => 'absint',
+				'validate_callback'  => 'rest_validate_request_arg',
+			),
+			'search'                 => array(
+				'description'        => __( 'Limit results to those matching a string.' ),
+				'type'               => 'string',
+				'sanitize_callback'  => 'sanitize_text_field',
+				'validate_callback'  => 'rest_validate_request_arg',
+			),
+		);
+	}
+
+	/**
+	 * Retrieves the magical context param.
+	 *
+	 * Ensures consistent description between endpoints, and populates enum from schema.
+	 *
+	 * @since 1.9
+	 * @access public
+	 *
+	 * @see \WP_REST_Controller::get_context_param()
+	 *
+	 * @param array $args {
+	 *     Optional. Parameter details. Default empty array.
+	 *
+	 *     @type string   $description       Parameter description.
+	 *     @type string   $type              Parameter type. Accepts 'string', 'integer', 'array',
+	 *                                       'object', etc. Default 'string'.
+	 *     @type callable $sanitize_callback Parameter sanitization callback. Default 'sanitize_key'.
+	 *     @type callable $validate_callback Parameter validation callback. Default empty.
+	 * }
+	 * @return array Context parameter details.
+	 */
+	public function get_context_param( $args = array() ) {
+		$param_details = array(
+			'description'       => __( 'Scope under which the request is made; determines fields present in response.' ),
+			'type'              => 'string',
+			'sanitize_callback' => 'sanitize_key',
+			'validate_callback' => '',
+		);
+
+		return array_merge( $param_details, $args );
 	}
 }

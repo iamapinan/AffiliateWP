@@ -356,10 +356,6 @@ final class Affiliate_WP {
 		require_once AFFILIATEWP_PLUGIN_DIR . 'includes/scripts.php';
 
 		// REST endpoints.
-		if ( ! class_exists( 'WP_REST_Controller' ) ) {
-			require_once( AFFILIATEWP_PLUGIN_DIR . 'includes/REST/class-wp-rest-controller.php' );
-		}
-
 		require_once AFFILIATEWP_PLUGIN_DIR . 'includes/REST/class-rest.php';
 		require_once AFFILIATEWP_PLUGIN_DIR . 'includes/REST/class-affiliates-rest.php';
 		require_once AFFILIATEWP_PLUGIN_DIR . 'includes/REST/class-creatives-rest.php';
