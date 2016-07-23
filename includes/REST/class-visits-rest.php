@@ -13,45 +13,33 @@ use \AffWP\REST\Controller as Controller;
 class REST extends Controller {
 
 	/**
+	 * Route base for visits.
+	 *
+	 * @since 1.9
+	 * @access public
+	 * @var string
+	 */
+	public $base = 'visits';
+
+	/**
 	 * Registers Visit routes.
 	 *
 	 * @since 1.9
 	 * @access public
-	 *
-	 * @param \WP_REST_Server $wp_rest_server Server object.
 	 */
-	public function register_routes( $wp_rest_server ) {
-		register_rest_route( $this->namespace, '/visits/', array(
-			'methods' => $wp_rest_server::READABLE,
-			'callback' => array( $this, 'ep_get_visits' ),
-			'args' => array(
-				/*
-				 * Pass top-level args as query vars:
-				 * /visits/?referral_status=pending&order=desc
-				 */
-				'number' => array(
-					'description'       => __( 'The number of visits to query for. Use -1 for all.', 'affiliate-wp' ),
-					'sanitize_callback' => 'absint',
-					'validate_callback' => 'is_numeric',
-				),
-				'order' => array(
-					'description'       => __( 'How to order results. Accepts ASC (ascending) or DESC (descending).', 'affiliate-wp' ),
-					'validate_callback' => function( $param, $request, $key ) {
-						return in_array( strtoupper( $param ), array( 'ASC', 'DESC' ) );
-					}
-				),
+	public function register_routes() {
 
-				/*
-				 * Pass any valid get_visits() args via filter:
-				 * /visits/?filter[referral_status]=pending&filter[order]=desc
-				 */
-				'filter' => array()
-			)
+		// /visits/
+		register_rest_route( $this->namespace, '/' . $this->base, array(
+			'methods'  => \WP_REST_Server::READABLE,
+			'callback' => array( $this, 'get_items' ),
+			'args'     => $this->get_collection_params(),
 		) );
 
-		register_rest_route( $this->namespace, '/visits/(?P<id>\d+)', array(
-			'methods'  => $wp_rest_server::READABLE,
-			'callback' => array( $this, 'ep_visit_id' ),
+		// /visits/ID
+		register_rest_route( $this->namespace, '/' . $this->base . '/(?P<id>\d+)', array(
+			'methods'  => \WP_REST_Server::READABLE,
+			'callback' => array( $this, 'get_item' ),
 			'args'     => array(
 				'id' => array(
 					'required'          => true,
@@ -75,7 +63,7 @@ class REST extends Controller {
 	 * @param \WP_REST_Request $request Request arguments.
 	 * @return array|\WP_Error Array of visits, otherwise WP_Error.
 	 */
-	public function ep_get_visits( $request ) {
+	public function get_items( $request ) {
 
 		$args = array();
 
@@ -116,11 +104,11 @@ class REST extends Controller {
 	 * @since 1.9
 	 * @access public
 	 *
-	 * @param \WP_REST_Request $args Request arguments.
+	 * @param \WP_REST_Request $request Request arguments.
 	 * @return \AffWP\Visit|\WP_Error Visit object or \WP_Error object if not found.
 	 */
-	public function ep_visit_id( $args ) {
-		if ( ! $visit = \affwp_get_visit( $args['id'] ) ) {
+	public function get_item( $request ) {
+		if ( ! $visit = \affwp_get_visit( $request['id'] ) ) {
 			$visit = new \WP_Error(
 				'invalid_visit_id',
 				'Invalid visit ID',
@@ -131,4 +119,43 @@ class REST extends Controller {
 		return $this->response( $visit );
 	}
 
+	/**
+	 * Retrieves the collection parameters for visits.
+	 *
+	 * @since 1.9
+	 * @access public
+	 * @return array
+	 */
+	public function get_collection_params() {
+		$params = parent::get_collection_params();
+
+		$params['context']['default'] = 'view';
+
+		/*
+		 * Pass top-level args as query vars:
+		 * /visits/?referral_status=pending&order=desc
+		 */
+		$params['number'] = array(
+			'description'       => __( 'The number of visits to query for. Use -1 for all.', 'affiliate-wp' ),
+			'sanitize_callback' => 'absint',
+			'validate_callback' => 'is_numeric',
+		);
+
+		$params['order'] = array(
+			'description'       => __( 'How to order results. Accepts ASC (ascending) or DESC (descending).', 'affiliate-wp' ),
+			'validate_callback' => function( $param, $request, $key ) {
+				return in_array( strtoupper( $param ), array( 'ASC', 'DESC' ) );
+			}
+		);
+
+		/*
+		 * Pass any valid get_visits() args via filter:
+		 * /visits/?filter[referral_status]=pending&filter[order]=desc
+		 */
+		$params['filter'] = array(
+			'description' => __( 'Use any get_visits() arguments to modify the response.', 'affiliate-wp' )
+		);
+
+		return $params;
+	}
 }

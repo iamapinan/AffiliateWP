@@ -13,45 +13,33 @@ use AffWP\REST\Controller as Controller;
 class REST extends Controller {
 
 	/**
+	 * Route base for affiliates.
+	 *
+	 * @since 1.9
+	 * @access public
+	 * @var string
+	 */
+	public $base = 'affiliates';
+
+	/**
 	 * Registers Affiliate routes.
 	 *
 	 * @since 1.9
 	 * @access public
-	 *
-	 * @param \WP_REST_Server $wp_rest_server Server object.
 	 */
-	public function register_routes( $wp_rest_server ) {
-		register_rest_route( $this->namespace, '/affiliates/', array(
-			'methods' => $wp_rest_server::READABLE,
-			'callback' => array( $this, 'ep_get_affiliates' ),
-			'args' => array(
-				/*
-				 * Pass top-level args as query vars:
-				 * /affiliates/?status=pending&order=desc
-				 */
-				'number' => array(
-					'description'       => __( 'The number of affiliates to query for. Use -1 for all.', 'affiliate-wp' ),
-					'sanitize_callback' => 'absint',
-					'validate_callback' => 'is_numeric',
-				),
-				'order' => array(
-					'description'       => __( 'How to order results. Accepts ASC (ascending) or DESC (descending).', 'affiliate-wp' ),
-					'validate_callback' => function( $param, $request, $key ) {
-						return in_array( strtoupper( $param ), array( 'ASC', 'DESC' ) );
-					}
-				),
+	public function register_routes() {
 
-				/*
-				 * Pass any valid get_creatives() args via filter:
-				 * /affiliates/?filter[status]=pending&filter[order]=desc
-				 */
-				'filter' => array()
-			)
+		// /affiliates/
+		register_rest_route( $this->namespace, '/' . $this->base, array(
+			'methods'  => \WP_REST_Server::READABLE,
+			'callback' => array( $this, 'get_items' ),
+			'args'     => $this->get_collection_params(),
 		) );
 
-		register_rest_route( $this->namespace, '/affiliates/(?P<id>\d+)', array(
-			'methods'  => $wp_rest_server::READABLE,
-			'callback' => array( $this, 'ep_affiliate_id' ),
+		// /affiliates/ID
+		register_rest_route( $this->namespace, '/' . $this->base . '/(?P<id>\d+)', array(
+			'methods'  => \WP_REST_Server::READABLE,
+			'callback' => array( $this, 'get_item' ),
 			'args'     => array(
 				'id' => array(
 					'required'          => true,
@@ -80,7 +68,7 @@ class REST extends Controller {
 	 * @param \WP_REST_Request $request Request arguments.
 	 * @return \WP_REST_Response|\WP_Error Affiliates response object or \WP_Error object if not found.
 	 */
-	public function ep_get_affiliates( $request ) {
+	public function get_items( $request ) {
 
 		$args = array();
 
@@ -123,11 +111,11 @@ class REST extends Controller {
 	 * @since 1.9
 	 * @access public
 	 *
-	 * @param \WP_REST_Request $args Request arguments.
+	 * @param \WP_REST_Request $request Request arguments.
 	 * @return \WP_REST_Response|\WP_Error Affiliate object response or \WP_Error object if not found.
 	 */
-	public function ep_affiliate_id( $args ) {
-		if ( ! $affiliate = \affwp_get_affiliate( $args['id'] ) ) {
+	public function get_item( $request ) {
+		if ( ! $affiliate = \affwp_get_affiliate( $request['id'] ) ) {
 			$affiliate = new \WP_Error(
 				'invalid_affiliate_id',
 				'Invalid affiliate ID',
@@ -161,5 +149,45 @@ class REST extends Controller {
 		}
 
 		return $affiliate;
+	}
+
+	/**
+	 * Retrieves the collection parameters for affiliates.
+	 *
+	 * @since 1.9
+	 * @access public
+	 * @return array
+	 */
+	public function get_collection_params() {
+		$params = parent::get_collection_params();
+
+		$params['context']['default'] = 'view';
+
+		/*
+		 * Pass top-level args as query vars:
+		 * /affiliates/?status=pending&order=desc
+		 */
+		$params['number'] = array(
+			'description'       => __( 'The number of affiliates to query for. Use -1 for all.', 'affiliate-wp' ),
+			'sanitize_callback' => 'absint',
+			'validate_callback' => 'is_numeric',
+		);
+
+		$params['order'] = array(
+			'description'       => __( 'How to order results. Accepts ASC (ascending) or DESC (descending).', 'affiliate-wp' ),
+			'validate_callback' => function( $param, $request, $key ) {
+				return in_array( strtoupper( $param ), array( 'ASC', 'DESC' ) );
+			}
+		);
+
+		/*
+		 * Pass any valid get_creatives() args via filter:
+		 * /affiliates/?filter[status]=pending&filter[order]=desc
+		 */
+		$params['filter'] = array(
+			'description' => __( 'Use any get_affiliates() arguments to modify the response.', 'affiliate-wp' )
+		);
+
+		return $params;
 	}
 }

@@ -7,7 +7,7 @@ namespace AffWP\REST;
  * @since 1.9
  * @abstract
  */
-abstract class Controller {
+abstract class Controller extends \WP_REST_Controller {
 
 	/**
 	 * AffWP REST namespace.
@@ -29,19 +29,6 @@ abstract class Controller {
 	public function __construct() {
 		add_action( 'rest_api_init', array( $this, 'register_routes' ), 15 );
 	}
-
-	/**
-	 * Registers REST routes.
-	 *
-	 * Must be defined by sub-classes.
-	 *
-	 * @since 1.9
-	 * @access public
-	 * @abstract
-	 *
-	 * @param WP_REST_Server $wp_rest_server Server object.
-	 */
-	abstract public function register_routes( $wp_rest_server );
 
 	/**
 	 * Converts an object or array of objects into a \WP_REST_Response object.

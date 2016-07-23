@@ -3,8 +3,6 @@
  * Class Affiliate_WP_Referrals_DB
  *
  * @see Affiliate_WP_DB
- *
- * @property-read \AffWP\Affiliate\REST $REST REST instance.
  */
 class Affiliate_WP_Referrals_DB extends Affiliate_WP_DB  {
 
@@ -28,6 +26,15 @@ class Affiliate_WP_Referrals_DB extends Affiliate_WP_DB  {
 	 * @var string
 	 */
 	public $query_object_type = 'AffWP\Referral';
+
+	/**
+	 * Referrals REST handler.
+	 *
+	 * @since 1.9
+	 * @access public
+	 * @var \AffWP\Referral\REST
+	 */
+	public $REST;
 
 	/**
 	 * Get things started
