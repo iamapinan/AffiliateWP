@@ -73,27 +73,26 @@ abstract class Controller {
 		return array(
 			'context'                => $this->get_context_param(),
 			'page'                   => array(
-				'description'        => __( 'Current page of the collection.' ),
+				'description'        => __( 'Current page of the collection.', 'affiliate-wp' ),
 				'type'               => 'integer',
 				'default'            => 1,
 				'sanitize_callback'  => 'absint',
-				'validate_callback'  => 'rest_validate_request_arg',
+				'validate_callback'  => 'is_numeric',
 				'minimum'            => 1,
 			),
 			'per_page'               => array(
-				'description'        => __( 'Maximum number of items to be returned in result set.' ),
+				'description'        => __( 'Maximum number of items to be returned in result set.', 'affiliate-wp' ),
 				'type'               => 'integer',
 				'default'            => 10,
 				'minimum'            => 1,
 				'maximum'            => 100,
 				'sanitize_callback'  => 'absint',
-				'validate_callback'  => 'rest_validate_request_arg',
+				'validate_callback'  => 'is_numeric',
 			),
 			'search'                 => array(
-				'description'        => __( 'Limit results to those matching a string.' ),
+				'description'        => __( 'Limit results to those matching a string.', 'affiliate-wp' ),
 				'type'               => 'string',
 				'sanitize_callback'  => 'sanitize_text_field',
-				'validate_callback'  => 'rest_validate_request_arg',
 			),
 		);
 	}
@@ -121,7 +120,7 @@ abstract class Controller {
 	 */
 	public function get_context_param( $args = array() ) {
 		$param_details = array(
-			'description'       => __( 'Scope under which the request is made; determines fields present in response.' ),
+			'description'       => __( 'Scope under which the request is made; determines fields present in response.', 'affiliate-wp' ),
 			'type'              => 'string',
 			'sanitize_callback' => 'sanitize_key',
 			'validate_callback' => '',
