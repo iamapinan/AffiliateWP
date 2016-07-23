@@ -19,7 +19,7 @@ class REST extends Controller {
 	 * @access public
 	 * @var string
 	 */
-	public $base = 'visits';
+	public $rest_base = 'visits';
 
 	/**
 	 * Registers Visit routes.
@@ -30,14 +30,14 @@ class REST extends Controller {
 	public function register_routes() {
 
 		// /visits/
-		register_rest_route( $this->namespace, '/' . $this->base, array(
+		register_rest_route( $this->namespace, '/' . $this->rest_base, array(
 			'methods'  => \WP_REST_Server::READABLE,
 			'callback' => array( $this, 'get_items' ),
 			'args'     => $this->get_collection_params(),
 		) );
 
 		// /visits/ID
-		register_rest_route( $this->namespace, '/' . $this->base . '/(?P<id>\d+)', array(
+		register_rest_route( $this->namespace, '/' . $this->rest_base . '/(?P<id>\d+)', array(
 			'methods'  => \WP_REST_Server::READABLE,
 			'callback' => array( $this, 'get_item' ),
 			'args'     => array(

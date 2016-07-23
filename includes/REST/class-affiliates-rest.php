@@ -19,7 +19,7 @@ class REST extends Controller {
 	 * @access public
 	 * @var string
 	 */
-	public $base = 'affiliates';
+	public $rest_base = 'affiliates';
 
 	/**
 	 * Registers Affiliate routes.
@@ -30,14 +30,14 @@ class REST extends Controller {
 	public function register_routes() {
 
 		// /affiliates/
-		register_rest_route( $this->namespace, '/' . $this->base, array(
+		register_rest_route( $this->namespace, '/' . $this->rest_base, array(
 			'methods'  => \WP_REST_Server::READABLE,
 			'callback' => array( $this, 'get_items' ),
 			'args'     => $this->get_collection_params(),
 		) );
 
 		// /affiliates/ID
-		register_rest_route( $this->namespace, '/' . $this->base . '/(?P<id>\d+)', array(
+		register_rest_route( $this->namespace, '/' . $this->rest_base . '/(?P<id>\d+)', array(
 			'methods'  => \WP_REST_Server::READABLE,
 			'callback' => array( $this, 'get_item' ),
 			'args'     => array(

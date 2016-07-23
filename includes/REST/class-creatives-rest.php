@@ -19,7 +19,7 @@ class REST extends Controller {
 	 * @access public
 	 * @var string
 	 */
-	public $base = 'creatives';
+	public $rest_base = 'creatives';
 
 	/**
 	 * Registers Creative routes.
@@ -28,13 +28,13 @@ class REST extends Controller {
 	 * @access public
 	 */
 	public function register_routes() {
-		register_rest_route( $this->namespace, '/' . $this->base, array(
+		register_rest_route( $this->namespace, '/' . $this->rest_base, array(
 			'methods'  => \WP_REST_Server::READABLE,
 			'callback' => array( $this, 'get_items' ),
 			'args'     => $this->get_collection_params(),
 		) );
 
-		register_rest_route( $this->namespace, '/' . $this->base . '/(?P<id>\d+)', array(
+		register_rest_route( $this->namespace, '/' . $this->rest_base . '/(?P<id>\d+)', array(
 			'methods'  => \WP_REST_Server::READABLE,
 			'callback' => array( $this, 'get_item' ),
 			'args'     => array(
