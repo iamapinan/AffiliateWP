@@ -62,7 +62,7 @@ jQuery(document).ready( function($) {
 			}
 
 			// build URL
-			url = url + refVar + '/' + affId + add + campaign;
+			url = url + refVar + '/' + affId + '/' + add + campaign;
 
 		} else {
 
