@@ -11,8 +11,8 @@
  *
  * @since 1.9
  *
- * @param int|AffWP\Payout $payout Payout ID or object.
- * @return AffWP\Payout|false Payout object if found, otherwise false.
+ * @param int|AffWP\Affiliate\Payout $payout Payout ID or object.
+ * @return AffWP\Affiliate\Payout|false Payout object if found, otherwise false.
  */
 function affwp_get_payout( $payout = 0 ) {
 
