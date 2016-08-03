@@ -115,7 +115,7 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 	 *     }
 	 *     @type string       $order         How to order returned payout results. Accepts 'ASC' or 'DESC'.
 	 *                                       Default 'DESC'.
-	 *     @type string       $orderby       Payouts table column to order results by. Accepts any AffWP\Payout
+	 *     @type string       $orderby       Payouts table column to order results by. Accepts any AffWP\Affiliate\Payout
 	 *                                       field. Default 'payout_id'.
 	 * }
 	 * @param bool  $count Optional. Whether to return only the total number of results found. Default false.
@@ -305,7 +305,7 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 			}
 		}
 
-		// Convert to AffWP\Payout objects.
+		// Convert to AffWP\Affiliate\Payout objects.
 		if ( is_array( $results ) ) {
 			$results = array_map( 'affwp_get_payout', $results );
 		}
