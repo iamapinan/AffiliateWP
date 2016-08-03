@@ -404,8 +404,6 @@ final class Affiliate_WP {
 		self::$instance->creative       = new Affiliate_WP_Creatives;
 		self::$instance->rewrites       = new Affiliate_WP_Rewrites;
 
-		self::$instance->affiliates->payouts = new Affiliate_WP_Payouts_DB;
-
 		self::$instance->updater();
 	}
 

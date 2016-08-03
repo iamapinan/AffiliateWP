@@ -49,6 +49,8 @@ class Affiliate_WP_DB_Affiliates extends Affiliate_WP_DB {
 		}
 		$this->primary_key = 'affiliate_id';
 		$this->version     = '1.1';
+
+		$this->payouts = new Affiliate_WP_Payouts_DB;
 	}
 
 	/**
