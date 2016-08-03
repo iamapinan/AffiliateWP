@@ -113,7 +113,7 @@ abstract class Object {
 		if ( 'ID' === $key ) {
 			$db_groups = self::get_db_groups();
 
-			if ( isset( $groups->secondary ) ) {
+			if ( isset( $db_groups->secondary ) ) {
 				$primary_key = affiliate_wp()->{$db_groups->primary}->{$db_groups->secondary}->primary_key;
 			} else {
 				$primary_key = affiliate_wp()->{$db_groups->primary}->primary_key;

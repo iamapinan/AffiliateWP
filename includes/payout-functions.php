@@ -24,7 +24,7 @@ function affwp_get_payout( $payout = 0 ) {
 		return false;
 	}
 
-	return affiliate_wp()->payouts->get_object( $payout_id );
+	return affiliate_wp()->affiliates->payouts->get_object( $payout_id );
 }
 
 /**
