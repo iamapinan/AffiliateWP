@@ -629,6 +629,9 @@ function affwp_clean_item_cache( $object ) {
 	// Prime the item cache.
 	$Object_Class::get_instance( $object->ID );
 
+	$db_groups      = $Object_Class::get_db_groups();
+	$db_cache_group = isset( $db_groups->secondary ) ? $db_groups->secondary : $db_groups->primary;
+
 	// last_changed for queries.
-	wp_cache_set( 'last_changed', microtime(), $Object_Class::$db_group );
+	wp_cache_set( 'last_changed', microtime(), $db_cache_group );
 }

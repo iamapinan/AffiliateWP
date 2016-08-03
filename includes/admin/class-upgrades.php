@@ -396,5 +396,17 @@ class Affiliate_WP_Upgrades {
 
 	}
 
+	/**
+	 * Performs database upgrades for version 1.9.
+	 *
+	 * @since 1.9
+	 * @access private
+	 */
+	private function v19_upgrade() {
+		@affiliate_wp()->affiliates->payouts->create_table();
+
+		$this->upgraded = true;
+	}
+
 }
 new Affiliate_WP_Upgrades;

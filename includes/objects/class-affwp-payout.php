@@ -8,7 +8,7 @@
  * @since 1.9
  */
 
-namespace AffWP;
+namespace AffWP\Affiliate;
 
 /**
  * Implements a payout object.
@@ -20,7 +20,7 @@ namespace AffWP;
  *
  * @property-read int $ID Alias for `$payout_id`.
  */
-final class Payout extends Object {
+final class Payout extends \AffWP\Object {
 
 	/**
 	 * Payout ID.
@@ -91,13 +91,13 @@ final class Payout extends Object {
 	/**
 	 * Database group.
 	 *
-	 * Used in \AffWP\Object for accessing the payouts DB class methods.
+	 * Used in \AffWP\Object for accessing the affiliates DB class methods.
 	 *
 	 * @since 1.9
 	 * @access public
 	 * @var string
 	 */
-	public static $db_group = 'payouts';
+	public static $db_group = 'affiliates:payouts';
 
 	/**
 	 * Object type.
@@ -128,7 +128,7 @@ final class Payout extends Object {
 		}
 
 		if ( 'referral_ids' === $field ) {
-			$value = array_map( 'intval', $value );
+			$value = implode( ',', wp_parse_id_list( $value ) );
 		}
 
 		if ( 'amount' === $field ) {

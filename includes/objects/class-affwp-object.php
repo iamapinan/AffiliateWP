@@ -49,7 +49,13 @@ abstract class Object {
 		$_object = wp_cache_get( $cache_key, $cache_group );
 
 		if ( false === $_object ) {
-			$_object = affiliate_wp()->{static::$db_group}->get( $object_id );
+			$db_groups = self::get_db_groups();
+
+			if ( isset( $db_groups->secondary ) ) {
+				$_object = affiliate_wp()->{$db_groups->primary}->{$db_groups->secondary}->get( $object_id );
+			} else {
+				$_object = affiliate_wp()->{$db_groups->primary}->get( $object_id );
+			}
 
 			if ( ! $_object ) {
 				return false;
@@ -105,7 +111,13 @@ abstract class Object {
 	 */
 	public function __get( $key ) {
 		if ( 'ID' === $key ) {
-			$primary_key  = affiliate_wp()->{static::$db_group}->primary_key;
+			$db_groups = self::get_db_groups();
+
+			if ( isset( $groups->secondary ) ) {
+				$primary_key = affiliate_wp()->{$db_groups->primary}->{$db_groups->secondary}->primary_key;
+			} else {
+				$primary_key = affiliate_wp()->{$db_groups->primary}->primary_key;
+			}
 
 			return $this->{$primary_key};
 		}
@@ -183,9 +195,16 @@ abstract class Object {
 				$updated = affiliate_wp()->visits->update_visit( $this->ID, $this->to_array() );
 				break;
 
+			// @todo Update handler for payouts.
+			case 'payout':
+				$updated = false;
+				break;
+
 			default:
 				// Affiliates and Creatives have update() methods.
-				$updated = affiliate_wp()->{static::$db_group}->update( $this->ID, $this->to_array(), '', $object_type );
+				$db_groups = self::get_db_groups();
+
+				$updated = affiliate_wp()->{$db_groups->primary}->update( $this->ID, $this->to_array(), '', $object_type );
 				break;
 		}
 
@@ -194,6 +213,31 @@ abstract class Object {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Splits the db groups if there is more than one.
+	 *
+	 * @since 1.9
+	 * @access public
+	 * @static
+	 *
+	 * @return object Object containing the primary and secondary group values.
+	 */
+	public static function get_db_groups() {
+		$groups = array(
+			'primary' => static::$db_group
+		);
+
+		if ( false !== strpos( static::$db_group, ':' ) ) {
+			$split = explode( ':', static::$db_group, 2 );
+
+			if ( isset( $split[1] ) ) {
+				$groups['secondary'] = $split[1];
+			}
+		}
+
+		return (object) $groups;
 	}
 
 	/**

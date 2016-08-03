@@ -3,6 +3,15 @@
 class Affiliate_WP_DB_Affiliates extends Affiliate_WP_DB {
 
 	/**
+	 * The payouts class instance variable.
+	 *
+	 * @var Affiliate_WP_Payouts_DB
+	 * @since 1.9
+	 * @access public
+	 */
+	public $payouts;
+
+	/**
 	 * Cache group for queries.
 	 *
 	 * @internal DO NOT change. This is used externally both as a cache group and shortcut

@@ -294,6 +294,7 @@ final class Affiliate_WP {
 		require_once AFFILIATEWP_PLUGIN_DIR . 'includes/objects/class-affwp-object.php';
 		require_once AFFILIATEWP_PLUGIN_DIR . 'includes/objects/class-affwp-affiliate.php';
 		require_once AFFILIATEWP_PLUGIN_DIR . 'includes/objects/class-affwp-creative.php';
+		require_once AFFILIATEWP_PLUGIN_DIR . 'includes/objects/class-affwp-payout.php';
 		require_once AFFILIATEWP_PLUGIN_DIR . 'includes/objects/class-affwp-referral.php';
 		require_once AFFILIATEWP_PLUGIN_DIR . 'includes/objects/class-affwp-visit.php';
 
@@ -301,6 +302,7 @@ final class Affiliate_WP {
 		require_once AFFILIATEWP_PLUGIN_DIR . 'includes/admin/settings/class-settings.php';
 		require_once AFFILIATEWP_PLUGIN_DIR . 'includes/class-db.php';
 		require_once AFFILIATEWP_PLUGIN_DIR . 'includes/class-affiliates-db.php';
+		require_once AFFILIATEWP_PLUGIN_DIR . 'includes/class-payouts-db.php';
 		require_once AFFILIATEWP_PLUGIN_DIR . 'includes/class-capabilities.php';
 
 		if ( is_admin() || ( defined( 'WP_CLI' ) && WP_CLI ) ) {
@@ -400,6 +402,8 @@ final class Affiliate_WP {
 		self::$instance->creatives      = new Affiliate_WP_Creatives_DB;
 		self::$instance->creative       = new Affiliate_WP_Creatives;
 		self::$instance->rewrites       = new Affiliate_WP_Rewrites;
+
+		self::$instance->affiliates->payouts = new Affiliate_WP_Payouts_DB;
 
 		self::$instance->updater();
 	}
