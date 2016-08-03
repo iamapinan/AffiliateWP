@@ -232,7 +232,8 @@ abstract class Object {
 		if ( false !== strpos( static::$db_group, ':' ) ) {
 			$split = explode( ':', static::$db_group, 2 );
 
-			if ( isset( $split[1] ) ) {
+			if ( 2 == count( $split) ) {
+				$groups['primary']   = $split[0];
 				$groups['secondary'] = $split[1];
 			}
 		}
