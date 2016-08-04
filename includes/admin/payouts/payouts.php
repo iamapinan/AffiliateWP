@@ -273,15 +273,18 @@ class AffWP_Payouts_Table extends WP_List_Table {
 	 * @return string Linked affiliate name and ID.
 	 */
 	function column_affiliate( $payout ) {
-		$base         = admin_url( 'admin.php?page=affiliate-wp&affiliate_id=' . $payout->affiliate_id );
-		$row_actions  = array();
-		$name         = affiliate_wp()->affiliates->get_affiliate_name( $payout->affiliate_id );
+		$url = add_query_arg( array(
+			'page'         => 'affiliate-wp-affiliates',
+			'action'       => 'edit_affiliate',
+			'affiliate_id' => $payout->affiliate_id
+		), admin_url( 'admin.php' ) );
 
+		$name      = affiliate_wp()->affiliates->get_affiliate_name( $payout->affiliate_id );
 		$affiliate = affwp_get_affiliate( $payout->affiliate_id );
 
 		if ( $affiliate && $name ) {
 			$value = sprintf( '<a href="%1$s">%2$s</a> (ID: %3$s)',
-				esc_url( get_edit_user_link( $affiliate->user_id ) ),
+				esc_url( $url ),
 				esc_html( $name ),
 				esc_html( $affiliate->ID )
 			);
