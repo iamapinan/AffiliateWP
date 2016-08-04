@@ -32,19 +32,28 @@ function affwp_payouts_admin() {
 		$payouts_table->prepare_items();
 ?>
 		<div class="wrap">
-			<h2><?php _e( 'Affiliates', 'affiliate-wp' ); ?>
-				<a href="<?php echo esc_url( add_query_arg( array( 'affwp_notice' => false, 'action' => 'add_affiliate' ) ) ); ?>" class="add-new-h2"><?php _e( 'Add New', 'affiliate-wp' ); ?></a>
-			</h2>
-			<?php do_action( 'affwp_affiliates_page_top' ); ?>
+			<?php
+			/**
+			 * Fires at the top of the Payouts page (outside the form element).
+			 *
+			 * @since 1.9
+			 */
+			do_action( 'affwp_payouts_page_top' );
+			?>
 			<form id="affwp-affiliates-filter" method="get" action="<?php echo admin_url( 'admin.php?page=affiliate-wp' ); ?>">
-				<?php $affiliates_table->search_box( __( 'Search', 'affiliate-wp' ), 'affwp-affiliates' ); ?>
+				<input type="hidden" name="page" value="affiliate-wp-payouts" />
 
-				<input type="hidden" name="page" value="affiliate-wp-affiliates" />
-
-				<?php $affiliates_table->views() ?>
-				<?php $affiliates_table->display() ?>
+				<?php $payouts_table->views() ?>
+				<?php $payouts_table->display() ?>
 			</form>
-			<?php do_action( 'affwp_affiliates_page_bottom' ); ?>
+			<?php
+			/**
+			 * Fires at the bottom of the Payouts page (outside the form element).
+			 *
+			 * @since 1.9
+			 */
+			do_action( 'affwp_affiliates_page_bottom' );
+			?>
 		</div>
 <?php
 
@@ -119,17 +128,6 @@ class AffWP_Payouts_Table extends WP_List_Table {
 
 		$this->get_affiliate_counts();
 	}
-
-	/**
-	 * Hides the search field.
-	 *
-	 * @since 1.9
-	 * @access public
-	 *
-	 * @param string $text Label for the search box
-	 * @param string $input_id ID of the search box
-	 */
-	public function search_box( $text, $input_id ) {}
 
 	/**
 	 * Retrieves the payout view types.
@@ -521,7 +519,7 @@ class AffWP_Payouts_Table extends WP_List_Table {
 		$page    = isset( $_GET['paged'] )    ? absint( $_GET['paged'] ) : 1;
 		$status  = isset( $_GET['status'] )   ? $_GET['status']          : '';
 		$search  = isset( $_GET['s'] )        ? $_GET['s']               : '';
-		$order   = isset( $_GET['order'] )    ? $_GET['order']           : 'DESC';
+		$order   = isset( $_GET['order'] )    ? $_GET['order']           : 'ASC';
 		$orderby = isset( $_GET['orderby'] )  ? $_GET['orderby']         : 'payout_id';
 
 		$per_page = $this->get_items_per_page( 'affwp_edit_payouts_per_page', $this->per_page );

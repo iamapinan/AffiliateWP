@@ -12,6 +12,7 @@ class Affiliate_WP_Admin_Menu {
 		add_submenu_page( 'affiliate-wp', __( 'Overview', 'affiliate-wp' ), __( 'Overview', 'affiliate-wp' ), 'view_affiliate_reports', 'affiliate-wp', 'affwp_affiliates_dashboard' );
 		add_submenu_page( 'affiliate-wp', __( 'Affiliates', 'affiliate-wp' ), __( 'Affiliates', 'affiliate-wp' ), 'manage_affiliates', 'affiliate-wp-affiliates', 'affwp_affiliates_admin' );
 		add_submenu_page( 'affiliate-wp', __( 'Referrals', 'affiliate-wp' ), __( 'Referrals', 'affiliate-wp' ), 'manage_referrals', 'affiliate-wp-referrals', 'affwp_referrals_admin' );
+		add_submenu_page( 'affiliate-wp', __( 'Payouts', 'affiliate-wp' ), __( 'Payouts', 'affiliate-wp' ), 'manage_referrals', 'affiliate-wp-payouts', 'affwp_payouts_admin' );
 		add_submenu_page( 'affiliate-wp', __( 'Visits', 'affiliate-wp' ), __( 'Visits', 'affiliate-wp' ), 'manage_visits', 'affiliate-wp-visits', 'affwp_visits_admin' );
 		add_submenu_page( 'affiliate-wp', __( 'Creatives', 'affiliate-wp' ), __( 'Creatives', 'affiliate-wp' ), 'manage_creatives', 'affiliate-wp-creatives', 'affwp_creatives_admin' );
 		add_submenu_page( 'affiliate-wp', __( 'Reports', 'affiliate-wp' ), __( 'Reports', 'affiliate-wp' ), 'view_affiliate_reports', 'affiliate-wp-reports', 'affwp_reports_admin' );
