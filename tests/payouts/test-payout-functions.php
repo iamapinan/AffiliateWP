@@ -25,7 +25,7 @@ class Payout_Function_Tests extends WP_UnitTestCase {
 
 		$this->_payout_id = affiliate_wp()->affiliates->payouts->add( array(
 			'affiliate_id' => $this->_affiliate_id,
-			'referral_ids' => $this->_referral_id,
+			'referrals'    => $this->_referral_id,
 			'amount'       => '10.00'
 		) );
 	}

@@ -47,7 +47,7 @@ final class Payout extends \AffWP\Object {
 	 * @access public
 	 * @var array
 	 */
-	public $referral_ids = array();
+	public $referrals = array();
 
 	/**
 	 * Payout amount.
@@ -127,7 +127,7 @@ final class Payout extends \AffWP\Object {
 			$value = (int) $value;
 		}
 
-		if ( 'referral_ids' === $field ) {
+		if ( 'referrals' === $field ) {
 			$value = implode( ',', wp_parse_id_list( $value ) );
 		}
 

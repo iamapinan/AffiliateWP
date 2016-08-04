@@ -67,7 +67,7 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 		return array(
 			'payout_id'     => '%d',
 			'affiliate_id'  => '%d',
-			'referral_ids'  => '%s',
+			'referrals'     => '%s',
 			'amount'        => '%s',
 			'payout_method' => '%s',
 			'date'          => '%s',
@@ -99,7 +99,7 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 	 *     @type int          $number        Number of payouts to query for. Default 20.
 	 *     @type int          $offset        Number of payouts to offset the query for. Default 0.
 	 *     @type int|array    $affiliate_id  Affiliate ID or array of affiliate IDs to retrieve payouts for.
-	 *     @type int|array    $referral_id   Referral ID or array of referral IDs to retrieve payouts for.
+	 *     @type int|array    $referrals     Array of referral IDsReferral ID or array of referral IDs to retrieve payouts for.
 	 *     @type float|array  $amount        {
 	 *         Payout amount to retrieve payouts for or min/max range to retrieve payouts for.
 	 *
@@ -128,7 +128,7 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 			'number'        => 20,
 			'offset'        => 0,
 			'affiliate_id'  => 0,
-			'referral_id'   => 0,
+			'referrals'     => 0,
 			'amount'        => 0,
 			'payout_method' => '',
 			'date'          => '',
@@ -157,15 +157,15 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 
 		// Referral ID(s).
 		// @todo Ensure querying single/multiple IDs in a stored array is covered.
-		if ( ! empty( $args['referral_id'] ) ) {
+		if ( ! empty( $args['referrals'] ) ) {
 
-			if ( is_array( $args['referral_id'] ) ) {
-				$referral_ids = implode( ',', array_map( 'intval', $args['referral_id'] ) );
+			if ( is_array( $args['referrals'] ) ) {
+				$referrals = implode( ',', array_map( 'intval', $args['referrals'] ) );
 			} else {
-				$referral_ids = intval( $args['referral_id'] );
+				$referrals = intval( $args['referrals'] );
 			}
 
-			$where .= "WHERE `referral_ids` IN( {$referral_ids} ) ";
+			$where .= "WHERE `referrals` IN( {$referrals} ) ";
 
 		}
 
@@ -358,7 +358,7 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 	 *     Optional. Array of arguments for adding a new payout. Default empty array.
 	 *
 	 *     @type int        $affiliate_id  Affiliate ID the payout should be associated with.
-	 *     @type int|string $referral_ids  Referral ID or array of IDs to associate the payout with.
+	 *     @type int|array  $referrals     Referral ID or array of IDs to associate the payout with.
 	 *     @type float      $amount        Payout amount.
 	 *     @type string     $payout_method Payout method.
 	 *     @type int|string $date          Date string or timestamp for when the payout was created.
@@ -368,8 +368,8 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 	public function add( $data = array() ) {
 
 		$defaults = array(
-			'referral_ids'  => 0,
-			'amount'        => 0,
+			'referrals' => array(),
+			'amount'    => 0,
 		);
 
 		$args = wp_parse_args( $data, $defaults );
@@ -382,12 +382,12 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 			return false;
 		}
 
-		if ( empty( $args['referral_ids'] ) ) {
+		if ( empty( $args['referrals'] ) ) {
 			return false;
 		}
 
-		if ( is_array( $args['referral_ids'] ) ) {
-			$args['referral_ids'] = implode( ',', $args['referral_ids'] );
+		if ( is_array( $args['referrals'] ) ) {
+			$args['referrals'] = implode( ',', $args['referrals'] );
 		}
 
 		$add = $this->insert( $args, 'payout' );
@@ -421,8 +421,9 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 		if ( ! $payout = affwp_get_payout( $payout ) ) {
 			$referral_ids = array();
 		} else {
-			return explode( ',', $payout->referral_ids );
+			$referral_ids = explode( ',', $payout->referrals );
 		}
+		return $referral_ids;
 	}
 
 	/**
@@ -437,7 +438,7 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 		$sql = "CREATE TABLE " . $this->table_name . " (
 			payout_id bigint(20) NOT NULL AUTO_INCREMENT,
 			affiliate_id bigint(20) NOT NULL,
-			referral_ids mediumtext NOT NULL,
+			referrals mediumtext NOT NULL,
 			amount mediumtext NOT NULL,
 			payout_method tinytext NOT NULL,
 			date datetime NOT NULL,
