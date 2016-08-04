@@ -68,6 +68,15 @@ final class Payout extends \AffWP\Object {
 	public $payout_method;
 
 	/**
+	 * Payout status.
+	 *
+	 * @since 1.9
+	 * @access public
+	 * @var string
+	 */
+	public $status;
+
+	/**
 	 * Payout date.
 	 *
 	 * @since 1.9
