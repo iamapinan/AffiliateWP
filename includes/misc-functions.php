@@ -635,3 +635,24 @@ function affwp_clean_item_cache( $object ) {
 	// last_changed for queries.
 	wp_cache_set( 'last_changed', microtime(), $db_cache_group );
 }
+
+/**
+ * Adds AffiliateWP postbox nonces, which are used
+ * to save the position of AffiliateWP meta boxes.
+ *
+ * @since  1.9
+ *
+ * @return void
+ */
+function affwp_add_screen_options_nonces() {
+
+	if ( ! affwp_is_admin_page() ) {
+		return;
+	}
+
+	wp_nonce_field( 'closedpostboxes', 'closedpostboxesnonce' , false );
+	wp_nonce_field( 'meta-box-order', 'meta-box-order-nonce' , false );
+
+
+}
+add_action( 'admin_footer', 'affwp_add_screen_options_nonces' );

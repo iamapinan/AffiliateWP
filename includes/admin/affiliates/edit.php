@@ -93,6 +93,23 @@ $reason       = affwp_get_affiliate_meta( $affiliate->affiliate_id, '_rejection_
 			<tr class="form-row">
 
 				<th scope="row">
+					<label for="website"><?php _e( 'Website', 'affiliate-wp' ); ?></label>
+				</th>
+
+				<td>
+					<input class="medium-text" type="text" name="website" id="website" value="<?php echo esc_attr( $user_info->user_url ); ?>" disabled="disabled" />
+					<p class="description"">
+						<?php echo wp_sprintf( __( 'The affiliate&#8217;s website. Will be empty if no website is specified. This can be changed on the <a href="%1$s" alt="%2$s">user edit screen</a>.', 'affiliate-wp' ),
+							esc_url( get_edit_user_link( $affiliate->user_id ) ),
+							esc_attr__( 'A link to the user edit screen for this user.', 'affiliate-wp' )
+						); ?>
+					</p>
+				</td>
+			</tr>
+
+			<tr class="form-row">
+
+				<th scope="row">
 					<label for="rate_type"><?php _e( 'Referral Rate Type', 'affiliate-wp' ); ?></label>
 				</th>
 

@@ -9,7 +9,7 @@ class Capabilities_Tests extends WP_UnitTestCase {
 	 */
 	public function setUp() {
 		parent::setUp();
-		
+
 		$this->_user_id = $this->factory->user->create( array(
 			'role' => 'administrator'
 		) );
@@ -47,7 +47,7 @@ class Capabilities_Tests extends WP_UnitTestCase {
 		 * We want to make sure we're testing against the db, not just in-memory data
 		 * this will flush everything and reload it from the db
 		 */
-		unset($GLOBALS['wp_user_roles']);
+		unset( $GLOBALS['wp_user_roles'] );
 		global $wp_roles;
 		if ( is_object( $wp_roles ) ) {
 			$wp_roles->_init();
@@ -55,3 +55,4 @@ class Capabilities_Tests extends WP_UnitTestCase {
 	}
 
 }
+

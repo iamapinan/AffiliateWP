@@ -5,7 +5,7 @@
  * Description: Affiliate Plugin for WordPress
  * Author: AffiliateWP, LLC
  * Author URI: https://affiliatewp.com
- * Version: 1.8.6
+ * Version: 1.8.7
  * Text Domain: affiliate-wp
  * Domain Path: languages
  *
@@ -24,7 +24,7 @@
  * @package AffiliateWP
  * @category Core
  * @author Pippin Williamson
- * @version 1.8.6
+ * @version 1.8.7
  */
 
 // Exit if accessed directly
@@ -51,7 +51,7 @@ final class Affiliate_WP {
 	 *
 	 * @since 1.0
 	 */
-	private $version = '1.8.6';
+	private $version = '1.8.7';
 
 	/**
 	 * The affiliates DB instance variable.
@@ -316,6 +316,7 @@ final class Affiliate_WP {
 			require_once AFFILIATEWP_PLUGIN_DIR . 'includes/admin/class-notices.php';
 			require_once AFFILIATEWP_PLUGIN_DIR . 'includes/admin/creatives/actions.php';
 			require_once AFFILIATEWP_PLUGIN_DIR . 'includes/admin/creatives/creatives.php';
+			require_once AFFILIATEWP_PLUGIN_DIR . 'includes/admin/class-metabox-base.php';
 			require_once AFFILIATEWP_PLUGIN_DIR . 'includes/admin/overview/overview.php';
 			require_once AFFILIATEWP_PLUGIN_DIR . 'includes/admin/referrals/actions.php';
 			require_once AFFILIATEWP_PLUGIN_DIR . 'includes/admin/referrals/referrals.php';

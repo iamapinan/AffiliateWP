@@ -27,20 +27,18 @@ add_action( 'affwp_update_profile_settings', 'affwp_update_profile_settings' );
  * @return array Filtered list of removable query arguments.
  */
 function affwp_remove_query_args( $query_args ) {
-	$to_remove = array(
-		// General
-		'affwp_notice',
-		'action',
-		'action2',
-		'settings-updated',
+	// Prevent certain repeated AffWP actions on refresh.
+	if ( isset( $_GET['_wpnonce'] )
+		&& (
+			isset( $_GET['affiliate_id'] )
+			|| isset( $_GET['creative_id'] )
+			|| isset( $_GET['referral_id'] )
+			|| isset( $_GET['visit_id'] )
+	     )
+	) {
+		$query_args[] = '_wpnonce';
+	}
 
-		// Affiliates
-		'affiliate_activated',
-
-		// Core
-		'_wpnonce'
-	);
-
-	return array_merge( $query_args, $to_remove );
+	return $query_args;
 }
-add_action( 'removable_query_args', 'affwp_remove_query_args' );
+add_filter( 'removable_query_args', 'affwp_remove_query_args' );

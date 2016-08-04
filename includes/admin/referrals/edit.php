@@ -41,7 +41,7 @@ $referral = affwp_get_referral( absint( $_GET['referral_id'] ) );
 			<tr class="form-row form-required">
 
 				<th scope="row">
-					<label for="amount"><?php _e( 'Date', 'affiliate-wp' ); ?></label>
+					<label for="date"><?php _e( 'Date', 'affiliate-wp' ); ?></label>
 				</th>
 
 				<td>
