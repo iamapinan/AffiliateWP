@@ -34,7 +34,6 @@ class Affiliate_WP_Rewrites {
 
 		}
 
-		add_action( 'redirect_canonical', array( $this, 'prevent_canonical_redirect' ), 0, 2 );
 	}
 
 	/**
@@ -86,7 +85,7 @@ class Affiliate_WP_Rewrites {
 
 		}
 
-		add_rewrite_endpoint( affiliate_wp()->tracking->get_referral_var(), EP_ALL );
+		add_rewrite_endpoint( affiliate_wp()->tracking->get_referral_var(), EP_ALL, false );
 
 	}
 
@@ -129,33 +128,6 @@ class Affiliate_WP_Rewrites {
 			}
 
 		}
-
-	}
-
-	/**
-	 * Filters on canonical redirects
-	 *
-	 * This was in Affiliate_WP_Tracking until 1.7.8
-	 *
-	 * @since 1.4
-	 * @return string
-	 */
-	public function prevent_canonical_redirect( $redirect_url, $requested_url ) {
-
-		if( ! is_front_page() ) {
-			return $redirect_url;
-		}
-
-		$key = affiliate_wp()->tracking->get_referral_var();
-		$ref = get_query_var( $key );
-
-		if( ! empty( $ref ) || false !== strpos( $requested_url, $key ) ) {
-
-			$redirect_url = $requested_url;
-
-		}
-
-		return $redirect_url;
 
 	}
 
