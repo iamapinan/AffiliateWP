@@ -44,3 +44,35 @@ function affwp_get_payout_referrals( $payout = 0 ) {
 
 	return array_map( 'affwp_get_referral', $referrals );
 }
+
+/**
+ * Retrieves the status label for a payout.
+ *
+ * @since 1.6
+ *
+ * @param int|AffWP\Affiliate\Payout $payout Payout ID or object.
+ * @return string|false The localized version of the payout status label, otherwise false.
+ */
+function affwp_get_payout_status_label( $payout ) {
+
+	if ( ! $payout = affwp_get_referral( $payout ) ) {
+		return false;
+	}
+
+	$statuses = array(
+		'paid'     => _x( 'Paid', 'payout', 'affiliate-wp' ),
+		'unpaid'   => __( 'Failed', 'affiliate-wp' ),
+	);
+
+	$label = array_key_exists( $payout->status, $statuses ) ? $statuses[ $payout->status ] : 'paid';
+
+	/**
+	 * Filters the payout status label.
+	 *
+	 * @since 1.9
+	 *
+	 * @param string                 $label  A localized version of the payout status label.
+	 * @param AffWP\Affiliate\Payout $payout Payout object.
+	 */
+	return apply_filters( 'affwp_referral_status_label', $label, $referral );
+}
