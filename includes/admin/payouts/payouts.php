@@ -32,6 +32,7 @@ function affwp_payouts_admin() {
 		$payouts_table->prepare_items();
 ?>
 		<div class="wrap">
+			<h2><?php _e( 'Payouts', 'affiliate-wp' ); ?></h2>
 			<?php
 			/**
 			 * Fires at the top of the Payouts page (outside the form element).
