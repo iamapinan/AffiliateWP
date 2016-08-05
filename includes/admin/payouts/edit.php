@@ -76,7 +76,7 @@ $payout = affwp_get_payout( absint( $_GET['payout_id'] ) );
 				</th>
 
 				<td>
-					<input type="text" name="amount" id="amount" value="<?php echo esc_attr( $payout->amount ); ?>" />
+					<input type="text" name="amount" id="amount" value="<?php echo esc_attr( $payout->amount ); ?>" disabled="disabled" />
 					<p class="description"><?php _e( 'The amount of the payout, such as $15.', 'affiliate-wp' ); ?></p>
 				</td>
 
@@ -89,7 +89,7 @@ $payout = affwp_get_payout( absint( $_GET['payout_id'] ) );
 				</th>
 
 				<td>
-					<input class="small-text" type="text" name="payout_method" id="payout_method" value="<?php echo esc_attr( $payout->payout_method ); ?>"/>
+					<input class="medium-text" type="text" name="payout_method" id="payout_method" value="<?php echo esc_attr( $payout->payout_method ); ?>" disabled="disabled" />
 					<p class="description"><?php _e( 'The payout method used, such as &#8220;paypal&#8221;. This cannot be changed.', 'affiliate-wp' ); ?></p>
 				</td>
 
@@ -102,7 +102,7 @@ $payout = affwp_get_payout( absint( $_GET['payout_id'] ) );
 				</th>
 
 				<td>
-					<select name="status" id="status">
+					<select name="status" id="status" disabled="disabled">
 						<option value="paid"<?php selected( 'paid', $payout->status ); ?>><?php _e( 'Paid', 'affiliate-wp' ); ?></option>
 						<option value="failed"<?php selected( 'failed', $payout->status ); ?>><?php _e( 'Failed', 'affiliate-wp' ); ?></option>
 					</select>
@@ -118,7 +118,7 @@ $payout = affwp_get_payout( absint( $_GET['payout_id'] ) );
 				</th>
 
 				<td>
-					<input type="text" name="date" id="date" value="<?php echo esc_attr( date_i18n( get_option( 'date_format' ), strtotime( $payout->date ) ) ); ?>" disabled="disabled" />
+					<?php echo date_i18n( get_option( 'date_format' ), strtotime( $payout->date ) ); ?>
 				</td>
 
 			</tr>
