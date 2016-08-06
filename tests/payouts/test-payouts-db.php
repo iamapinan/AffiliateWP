@@ -79,4 +79,44 @@ class Payouts_DB_Tests extends WP_UnitTestCase {
 		$this->assertSame( '1,2,3', affiliate_wp()->affiliates->payouts->get_column( 'referrals', $payout_id ) );
 	}
 
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::payout_exists()
+	 */
+	public function test_payout_exists_should_return_false_if_payout_does_not_exist() {
+		$this->assertFalse( affiliate_wp()->affiliates->payouts->payout_exists( 0 ) );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::payout_exists()
+	 */
+	public function test_payout_exists_should_return_true_if_payout_exists() {
+		$this->assertTrue( affiliate_wp()->affiliates->payouts->payout_exists( $this->_payout_id ) );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::payout_exists()
+	 */
+	public function test_column_defaults_should_return_zero_for_payout_id() {
+		$defaults = affiliate_wp()->affiliates->payouts->get_column_defaults();
+
+		$this->assertSame( 0, $defaults['payout_id'] );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::payout_exists()
+	 */
+	public function test_column_defaults_should_return_paid_status() {
+		$defaults = affiliate_wp()->affiliates->payouts->get_column_defaults();
+
+		$this->assertSame( 'paid', $defaults['status'] );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::payout_exists()
+	 */
+	public function test_column_defaults_should_return_the_current_date_for_date() {
+		$defaults = affiliate_wp()->affiliates->payouts->get_column_defaults();
+
+		$this->assertSame( date( 'Y-m-d H:i:s' ), $defaults['date'] );
+	}
 }
