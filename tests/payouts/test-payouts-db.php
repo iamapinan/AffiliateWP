@@ -119,4 +119,39 @@ class Payouts_DB_Tests extends WP_UnitTestCase {
 
 		$this->assertSame( date( 'Y-m-d H:i:s' ), $defaults['date'] );
 	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_columns()
+	 */
+	public function test_get_columns_should_return_all_columns() {
+		$columns = affiliate_wp()->affiliates->payouts->get_columns();
+
+		$expected = array(
+			'payout_id'     => '%d',
+			'affiliate_id'  => '%d',
+			'referrals'     => '%s',
+			'amount'        => '%s',
+			'payout_method' => '%s',
+			'status'        => '%s',
+			'date'          => '%s',
+		);
+
+		$this->assertEqualSets( $expected, $columns );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_object()
+	 */
+	public function test_get_object_should_return_false_if_invalid_payout_id() {
+		$this->assertFalse( affiliate_wp()->affiliates->payouts->get_object( 0 ) );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_object()
+	 */
+	public function test_get_object_should_return_payout_object_if_valid_payout_id() {
+		$this->assertInstanceOf( 'AffWP\Affiliate\Payout', affiliate_wp()->affiliates->payouts->get_object( $this->_payout_id ) );
+	}
+
+
 }

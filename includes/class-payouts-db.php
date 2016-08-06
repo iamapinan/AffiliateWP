@@ -50,8 +50,8 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 	 *
 	 * @see Affiliate_WP_DB::get_core_object()
 	 *
-	 * @param int|object|AffWP\Affiliate\Payout $payout Payout ID or object.
-	 * @return AffWP\Affiliate\Payout|null Payout object, null otherwise.
+	 * @param int $payout Payout ID or object.
+	 * @return AffWP\Affiliate\Payout|false Payout object, null otherwise.
 	 */
 	public function get_object( $payout ) {
 		return $this->get_core_object( $payout, $this->query_object_type );
