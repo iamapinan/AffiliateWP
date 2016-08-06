@@ -153,5 +153,32 @@ class Payouts_DB_Tests extends WP_UnitTestCase {
 		$this->assertInstanceOf( 'AffWP\Affiliate\Payout', affiliate_wp()->affiliates->payouts->get_object( $this->_payout_id ) );
 	}
 
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_referral_ids()
+	 */
+	public function test_get_referral_ids_should_return_empty_array_if_invalid_payout_id() {
+		$this->assertSame( array(), affiliate_wp()->affiliates->payouts->get_referral_ids( 0 ) );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_referral_ids()
+	 */
+	public function test_get_referral_ids_should_return_empty_array_if_invalid_payout_object() {
+		$this->assertSame( array(), affiliate_wp()->affiliates->payouts->get_referral_ids( new \stdClass() ) );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_referral_ids()
+	 */
+	public function test_get_referral_ids_should_return_an_array_of_referral_ids() {
+		$referral_ids = range( 20, 25 );
+
+		$payout_id = affiliate_wp()->affiliates->payouts->add( array(
+			'affiliate_id' => $this->_affiliate_id,
+			'referrals'    => $referral_ids
+		) );
+
+		$this->assertEqualSets( $referral_ids, affiliate_wp()->affiliates->payouts->get_referral_ids( $payout_id ) );
+	}
 
 }
