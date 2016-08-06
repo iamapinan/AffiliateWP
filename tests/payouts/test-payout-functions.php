@@ -71,6 +71,34 @@ class Payout_Function_Tests extends WP_UnitTestCase {
 	}
 
 	/**
+	 * @covers affwp_delete_payout()
+	 */
+	public function test_delete_payout_should_return_false_if_invalid_payout_id() {
+		$this->assertFalse( affwp_delete_payout( 0 ) );
+	}
+
+	/**
+	 * @covers affwp_delete_payout()
+	 */
+	public function test_delete_payout_should_return_false_if_invalid_payout_object() {
+		$this->assertFalse( affwp_delete_payout( new \stdClass() ) );
+	}
+
+	/**
+	 * @covers affwp_delete_payout()
+	 */
+	public function test_delete_payout_should_return_true_if_payout_deleted_successfully() {
+		$this->assertTrue( affwp_delete_payout( $this->_payout_id ) );
+	}
+
+	/**
+	 * @covers affwp_delete_payout()
+	 */
+	public function test_delete_payout_should_reset_paid_referral_status_to_unpaid() {
+		
+	}
+
+	/**
 	 * @covers affwp_get_payout_referrals()
 	 */
 	public function test_get_payout_referrals_should_return_false_if_invalid_payout() {

@@ -28,6 +28,46 @@ function affwp_get_payout( $payout = 0 ) {
 }
 
 /**
+ * Deletes a payout.
+ *
+ * @since 1.9
+ *
+ * @param int|\AffWP\Affiliate\Payout $payout Payout ID or object.
+ * @return bool True if the payout was successfully deleted, otherwise false.
+ */
+function affwp_delete_payout( $payout ) {
+	if ( ! $payout = affwp_get_payout( $payout ) ) {
+		return false;
+	}
+
+	// Handle updating paid referrals to unpaid.
+	if ( $payout && 'paid' === $payout->status ) {
+		$referrals = affiliate_wp()->affiliates->payouts->get_referral_ids( $payout );
+
+		foreach ( $referrals as $referral_id ) {
+			if ( 'paid' == affwp_get_referral_status( $referral_id ) ) {
+				affwp_set_referral_status( $referral_id, 'unpaid' );
+			}
+		}
+	}
+
+	if ( affiliate_wp()->affiliates->payouts->delete( $payout->ID ) ) {
+		/**
+		 * Fires immediately after a payout has been deleted.
+		 *
+		 * @since 1.9
+		 *
+		 * @param int $payout_id Payout ID.
+		 */
+		do_action( 'affwp_delete_payout', $payout->ID );
+
+		return true;
+	}
+
+	return false;
+}
+
+/**
  * Retrieves the referrals associated with a payout.
  *
  * @since 1.9
