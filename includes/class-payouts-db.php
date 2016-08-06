@@ -157,7 +157,7 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 				$affiliates = intval( $args['affiliate_id'] );
 			}
 
-			$where .= "AND `affiliate_id` IN( {$affiliates} )";
+			$where .= "WHERE `affiliate_id` IN( {$affiliates} ) ";
 		}
 
 		// Referral ID(s).
@@ -170,7 +170,11 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 				$referrals = intval( $args['referrals'] );
 			}
 
-			$where .= "WHERE `referrals` IN( {$referrals} ) ";
+			if ( empty( $where ) ) {
+				$where .= "WHERE `referrals` IN( {$referrals} ) ";
+			} else {
+				$where .= "AND `referrals` IN( {$referrals} ) ";
+			}
 
 		}
 
