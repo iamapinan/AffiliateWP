@@ -56,7 +56,6 @@ function affwp_get_payout_referrals( $payout = 0 ) {
 function affwp_get_payout_status_label( $payout ) {
 
 	if ( ! $payout = affwp_get_payout( $payout ) ) {
-		var_dump( 'bail' );
 		return false;
 	}
 
