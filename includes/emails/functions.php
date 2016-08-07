@@ -176,3 +176,13 @@ function affwp_email_tag_affiliate_id( $affiliate_id = 0 ) {
 	return $affiliate_id;
 }
 
+/**
+ * Email template tag: referral rate
+ * The affiliate's referral rate as shown from Affiliate -> Affiliates
+ *
+ * @since 1.9
+ * @return string referral_rate
+ */
+function affwp_email_tag_referral_rate( $affiliate_id = 0 ) {
+	return affwp_get_affiliate_rate( $affiliate_id, true );
+}

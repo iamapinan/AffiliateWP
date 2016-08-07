@@ -471,6 +471,11 @@ class Affiliate_WP_Emails {
 				'tag'         => 'affiliate_id',
 				'description' => __( 'The affiliate&#8217;s ID', 'affiliate-wp' ),
 				'function'    => 'affwp_email_tag_affiliate_id'
+			),
+			array(
+				'tag'         => 'referral_rate',
+				'description' => __( 'The affiliate&#8217;s referral rate', 'affiliate-wp' ),
+				'function'    => 'affwp_email_tag_referral_rate'
 			)
 		);
 
