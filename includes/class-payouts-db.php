@@ -90,7 +90,7 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 	}
 
 	/**
-	 * Adds a new payout.
+	 * Adds a new single payout.
 	 *
 	 * @since 1.9
 	 * @access public
@@ -121,23 +121,31 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 			return false;
 		}
 
-		if ( empty( $args['referrals'] ) ) {
-			return false;
-		}
-
 		if ( ! is_array( $args['referrals'] ) ) {
 			$args['referrals'] = (array) $args['referrals'];
 		}
 
-		foreach ( $args['referrals'] as $referral_id ) {
-			if ( ! $referral = affwp_get_referral( $referral_id ) ) {
-				return false;
+		foreach ( $args['referrals'] as $index => $referral_id ) {
+			if ( $referral = affwp_get_referral( $referral_id ) ) {
+				// Referral affiliate doesn't match.
+				if ( $args['affiliate_id'] !== $referral->affiliate_id ) {
+					unset( $args['referrals'][ $index ] );
+				}
+			} else {
+				// Referral doesn't exist. Drop it.
+				unset( $args['referrals'][ $index ] );
 			}
 		}
 
-		$args['referrals'] = implode( ',', $args['referrals'] );
+		$referrals = $args['referrals'];
 
-		$add = $this->insert( $args, 'payout' );
+		if ( empty( $args['referrals'] ) ) {
+			$add = false;
+		} else {
+			$args['referrals'] = implode( ',', $args['referrals'] );
+
+			$add = $this->insert( $args, 'payout' );
+		}
 
 		if ( $add ) {
 			/**
@@ -148,6 +156,11 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 			 * @param int $add New payout ID.
 			 */
 			do_action( 'affwp_insert_payout', $add );
+
+			// Add the payout IDs to the referral records.
+			foreach ( $referrals as $referral_id ) {
+				affiliate_wp()->referrals->update( $referral_id, array( 'payout_id' => $add ), '', 'referral' );
+			}
 
 			return $add;
 		}
