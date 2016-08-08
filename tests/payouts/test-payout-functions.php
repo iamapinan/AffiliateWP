@@ -95,7 +95,7 @@ class Payout_Function_Tests extends WP_UnitTestCase {
 	 * @covers affwp_delete_payout()
 	 */
 	public function test_delete_payout_should_reset_paid_referral_status_to_unpaid() {
-		
+
 	}
 
 	/**

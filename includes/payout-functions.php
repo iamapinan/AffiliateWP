@@ -28,6 +28,89 @@ function affwp_get_payout( $payout = 0 ) {
 }
 
 /**
+ * Adds a payout record.
+ *
+ * @since 1.9
+ *
+ * @param array $data {
+ *     Optional. Data for adding a new payout record. Default empty array.
+ *
+ *     @type int          $affiliate_id  Affiliate ID.
+ *     @type int          $referral_id   Referral ID.
+ *     @type string       $amount        Payout amount.
+ *     @type string       $payout_method Payout method.
+ *     @type string       $status        Payout status. Default 'paid'.
+ *     @type string|array $date          Payout date.
+ * }
+ * @return int|false The ID for the newly-added payout, otherwise false.
+ */
+function affwp_add_payout( $data = array() ) {
+
+	$args = array(
+		'amount'        => 0,
+		'payout_method' => '',
+		'status'        => 'paid',
+	);
+
+	if ( empty( $data['referrals'] ) ) {
+		return false;
+	} else {
+		if ( is_array( $data['referrals'] ) ) {
+			$args['referrals'] = array_map( 'absint', $data['referrals'] );
+		} else {
+			$args['referrals'] = (array) absint( $data['referrals'] );
+		}
+	}
+
+	if ( empty( $data['affiliate_id'] ) ) {
+		return false;
+	} else {
+		$args['affiliate_id'] = absint( $data['affiliate_id'] );
+	}
+
+	if ( ! empty( $data['amount'] ) ) {
+		$args['amount'] = affwp_sanitize_amount( $data['amount'] );
+	} else {
+		$amount = 0;
+
+		foreach ( $args['referrals'] as $referral_id ) {
+			if ( $referral = affwp_get_referral( $referral_id ) ) {
+				$amount += $referral->amount;
+			}
+		}
+		$args['amount'] = $amount;
+	}
+
+	if ( ! empty( $data['payout_method'] ) ) {
+		$args['payout_method'] = sanitize_text_field( $data['payout_method'] );
+	}
+
+	/**
+	 * Filters the payout method when adding a payout.
+	 *
+	 * @since 1.9
+	 *
+	 * @param string $payout_method Payout method.
+	 * @param array  $data          Data for adding a payout.
+	 */
+	$args['payout_method'] = apply_filters( 'affwp_add_payout_method', $args['payout_method'], $data );
+
+	if ( ! empty( $data['status'] ) ) {
+		$args['status'] = sanitize_text_field( $data['status'] );
+	}
+
+	if ( ! empty( $data['date'] ) ) {
+		$args['date'] = $data['date'];
+	}
+
+	if ( $payout = affiliate_wp()->affiliates->payouts->add( $args ) ) {
+		return $payout;
+	}
+
+	return false;
+}
+
+/**
  * Deletes a payout.
  *
  * @since 1.9
