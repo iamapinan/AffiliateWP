@@ -169,6 +169,51 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 	}
 
 	/**
+	 * Builds an associative array of affiliate IDs to their corresponding referrals.
+	 *
+	 * @since 1.9
+	 * @access public
+	 *
+	 * @param array $referrals Array of referral IDs.
+	 * @return array Associative array of affiliates to referral IDs where affiliate IDs
+	 *               are the index with a sub-array of corresponding referral IDs.
+	 */
+	public function get_affiliate_ids_by_referral( $referrals ) {
+		$referrals = array_map( 'affwp_get_referral', $referrals );
+
+		$affiliates = array();
+
+		foreach ( $referrals as $referral ) {
+			$affiliates[ $referral->affiliate_id ][] = $referral->ID;
+		}
+
+		return $affiliates;
+	}
+
+	/**
+	 * Builds an array of payout IDs given an associative array of affiliate IDS to their
+	 * corresponding referral IDs.
+	 *
+	 * @since 1.9
+	 * @access public
+	 *
+	 * @param array $affiliates Associative array of affiliate IDs to their corresponding
+	 *                          referral IDs.
+	 * @return array List of payout IDs for all referrals.
+	 */
+	public function get_payout_ids_by_affiliate( $affiliates ) {
+		$payout_ids = array();
+
+		foreach ( $affiliates as $affiliate => $referrals ) {
+			foreach ( $referrals as $referral ) {
+				$payout_ids[] = affiliate_wp()->referrals->get_column( 'payout_id', $referral );
+			}
+		}
+
+		return $payout_ids;
+	}
+
+	/**
 	 * Retrieve payouts from the database
 	 *
 	 * @since 1.9
@@ -244,32 +289,26 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 		}
 
 		// Referral ID(s).
-		// @todo Ensure querying single/multiple IDs in a stored array is covered.
-//		if ( ! empty( $args['referrals'] ) ) {
-//
-//			if ( is_array( $args['referrals'] ) ) {
-//				$referrals = implode( ',', array_map( 'intval', $args['referrals'] ) );
-//			} else {
-//				$referrals = intval( $args['referrals'] );
-//			}
-//
-//			$referrals_table = affiliate_wp()->referrals->table_name;
-//
-//			$payout_ids = $wpdb->get_results(
-//				$wpdb->prepare(
-//					"SELECT payout_id FROM {$referrals_table} WHERE `referral_id` IN( %s ) LIMIT %s",
-//					$referrals,
-//					count( $referrals )
-//				)
-//			);
-//
-//			if ( empty( $where ) ) {
-//				$where .= "WHERE `referrals` IN( {$referrals} ) ";
-//			} else {
-//				$where .= "AND `referrals` IN( {$referrals} ) ";
-//			}
-//
-//		}
+		if ( ! empty( $args['referrals'] ) ) {
+
+			if ( ! is_array( $args['referrals'] ) ) {
+				$args['referrals'] = (array) $args['referrals'];
+			}
+
+			$affiliates = $this->get_affiliate_ids_by_referral( $args['referrals'] );
+
+			$payout_ids = array_unique( $this->get_payout_ids_by_affiliate( $affiliates ) );
+
+			if ( ! empty( $payout_ids ) ) {
+				$payout_ids = implode( ',', $payout_ids );
+
+				if ( empty( $where ) ) {
+					$where .= "WHERE `payout_id` IN( {$payout_ids} ) ";
+				} else {
+					$where .= "AND `payout_id` IN( {$payout_ids} ) ";
+				}
+			}
+		}
 
 		// Amount.
 		if ( ! empty( $args['amount'] ) ) {
