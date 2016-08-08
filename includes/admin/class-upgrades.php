@@ -403,6 +403,7 @@ class Affiliate_WP_Upgrades {
 	 * @access private
 	 */
 	private function v19_upgrade() {
+		@affiliate_wp()->referrals->create_table();
 		@affiliate_wp()->affiliates->payouts->create_table();
 
 		$this->upgraded = true;
