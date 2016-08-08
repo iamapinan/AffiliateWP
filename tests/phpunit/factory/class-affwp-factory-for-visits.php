@@ -16,9 +16,10 @@ class AffWP_Factory_For_Visits extends WP_UnitTest_Factory_For_Thing {
 	function create_object( $args ) {
 		$affiliate = new AffWP_Factory_For_Affiliates();
 
-		$args = array_merge( array(
-			'affiliate_id' => $affiliate->create()
-		), $args );
+		// Only create the associated affiliate if one wasn't supplied.
+		if ( empty( $args['affiliate_id'] ) ) {
+			$args['affiliate_id'] = $affiliate->create();
+		}
 
 		return affiliate_wp()->visits->add( $args );
 	}
