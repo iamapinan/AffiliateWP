@@ -7,39 +7,6 @@
  */
 class Payout_Function_Tests extends AffiliateWP_UnitTestCase {
 
-	protected $_payout_id, $_affiliate_id, $_referral_id;
-
-	/**
-	 * Set up.
-	 */
-	public function setUp() {
-		parent::setUp();
-
-		$this->_affiliate_id = affiliate_wp()->affiliates->add( array(
-			'user_id' => $this->factory->user->create()
-		) );
-
-		$this->_referral_id = affiliate_wp()->referrals->add( array(
-			'affiliate_id' => $this->_affiliate_id
-		) );
-
-		$this->_payout_id = affiliate_wp()->affiliates->payouts->add( array(
-			'affiliate_id' => $this->_affiliate_id,
-			'referrals'    => $this->_referral_id,
-			'amount'       => '10.00'
-		) );
-	}
-
-	/**
-	 * Tear down.
-	 */
-	public function tearDown() {
-		affwp_delete_affiliate( $this->_affiliate_id );
-		affwp_delete_referral( $this->_referral_id );
-
-		parent::tearDown();
-	}
-
 	/**
 	 * @covers affwp_get_payout()
 	 */
