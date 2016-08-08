@@ -18,6 +18,11 @@ class AffWP_Factory extends WP_UnitTest_Factory {
 	public $creative;
 
 	/**
+	 * @var AffWP_Factory_For_Payouts
+	 */
+	public $payout;
+
+	/**
 	 * @var AffWP_Factory_For_Referrals
 	 */
 	public $referral;
@@ -30,6 +35,7 @@ class AffWP_Factory extends WP_UnitTest_Factory {
 	function __construct() {
 		$this->affiliate = new AffWP_Factory_For_Affiliates( $this );
 		$this->creative  = new AffWP_Factory_For_Creatives( $this );
+		$this->payout    = New AffWP_Factory_For_Payouts( $this );
 		$this->referral  = new AffWP_Factory_For_Referrals( $this );
 		$this->visit     = new AffWP_Factory_For_Visits( $this );
 	}
