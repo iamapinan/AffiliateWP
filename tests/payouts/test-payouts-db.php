@@ -258,6 +258,10 @@ class Payouts_DB_Tests extends WP_UnitTestCase {
 		);
 	}
 
+	//
+	// Helpers
+	//
+
 	/**
 	 * Helper to set up payouts.
 	 *
