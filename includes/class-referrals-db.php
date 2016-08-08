@@ -79,6 +79,7 @@ class Affiliate_WP_Referrals_DB extends Affiliate_WP_DB  {
 			'campaign'    => '%s',
 			'reference'   => '%s',
 			'products'    => '%s',
+			'payout_id'   => '%d',
 			'date'        => '%s',
 		);
 	}
@@ -701,6 +702,7 @@ class Affiliate_WP_Referrals_DB extends Affiliate_WP_DB  {
 		campaign varchar(30) NOT NULL,
 		reference mediumtext NOT NULL,
 		products mediumtext NOT NULL,
+		payout_id bigint(20) NOT NULL,
 		date datetime NOT NULL,
 		PRIMARY KEY  (referral_id),
 		KEY affiliate_id (affiliate_id)
