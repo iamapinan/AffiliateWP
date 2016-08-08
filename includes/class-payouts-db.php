@@ -450,7 +450,7 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 		if ( ! $payout = affwp_get_payout( $payout ) ) {
 			$referral_ids = array();
 		} else {
-			$referral_ids = explode( ',', $payout->referrals );
+			$referral_ids = array_map( 'intval', explode( ',', $payout->referrals ) );
 		}
 		return $referral_ids;
 	}
