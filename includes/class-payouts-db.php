@@ -411,11 +411,11 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 			$args['referrals'] = (array) $args['referrals'];
  		}
 
-// 		foreach ( $args['referrals'] as $referral_id ) {
-// 			if ( ! $referral = affwp_get_referral( $referral_id ) ) {
-// 				return false;
-//		    }
-//	    }
+		foreach ( $args['referrals'] as $referral_id ) {
+			if ( ! $referral = affwp_get_referral( $referral_id ) ) {
+				return false;
+			}
+		}
 
 	    $args['referrals'] = implode( ',', $args['referrals'] );
 
