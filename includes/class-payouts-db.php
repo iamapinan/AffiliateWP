@@ -166,21 +166,31 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 
 		// Referral ID(s).
 		// @todo Ensure querying single/multiple IDs in a stored array is covered.
-		if ( ! empty( $args['referrals'] ) ) {
-
-			if ( is_array( $args['referrals'] ) ) {
-				$referrals = implode( ',', array_map( 'intval', $args['referrals'] ) );
-			} else {
-				$referrals = intval( $args['referrals'] );
-			}
-
-			if ( empty( $where ) ) {
-				$where .= "WHERE `referrals` IN( {$referrals} ) ";
-			} else {
-				$where .= "AND `referrals` IN( {$referrals} ) ";
-			}
-
-		}
+//		if ( ! empty( $args['referrals'] ) ) {
+//
+//			if ( is_array( $args['referrals'] ) ) {
+//				$referrals = implode( ',', array_map( 'intval', $args['referrals'] ) );
+//			} else {
+//				$referrals = intval( $args['referrals'] );
+//			}
+//
+//			$referrals_table = affiliate_wp()->referrals->table_name;
+//
+//			$payout_ids = $wpdb->get_results(
+//				$wpdb->prepare(
+//					"SELECT payout_id FROM {$referrals_table} WHERE `referral_id` IN( %s ) LIMIT %s",
+//					$referrals,
+//					count( $referrals )
+//				)
+//			);
+//
+//			if ( empty( $where ) ) {
+//				$where .= "WHERE `referrals` IN( {$referrals} ) ";
+//			} else {
+//				$where .= "AND `referrals` IN( {$referrals} ) ";
+//			}
+//
+//		}
 
 		// Amount.
 		if ( ! empty( $args['amount'] ) ) {
@@ -371,7 +381,7 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 	 *     Optional. Array of arguments for adding a new payout. Default empty array.
 	 *
 	 *     @type int        $affiliate_id  Affiliate ID the payout should be associated with.
-	 *     @type int|array  $referrals     Referral ID or array of IDs to associate the payout with.
+	 *     @type array      $referrals     Referral ID or array of IDs to associate the payout with.
 	 *     @type float      $amount        Payout amount.
 	 *     @type string     $payout_method Payout method.
 	 *     @type string     $status        Payout status. Will be 'paid' unless there's a problem.
@@ -382,15 +392,12 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 	public function add( $data = array() ) {
 
 		$defaults = array(
-			'referrals' => array(),
-			'amount'    => 0,
+			'affiliate_id' => 0,
+			'referrals'    => array(),
+			'amount'       => 0,
 		);
 
 		$args = wp_parse_args( $data, $defaults );
-
-		if ( empty( $args['affiliate_id'] ) ) {
-			return false;
-		}
 
 		if ( ! affiliate_wp()->affiliates->affiliate_exists( $args['affiliate_id'] ) ) {
 			return false;
@@ -400,9 +407,17 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 			return false;
 		}
 
-		if ( is_array( $args['referrals'] ) ) {
-			$args['referrals'] = implode( ',', $args['referrals'] );
-		}
+		if ( ! is_array( $args['referrals'] ) ) {
+			$args['referrals'] = (array) $args['referrals'];
+ 		}
+
+// 		foreach ( $args['referrals'] as $referral_id ) {
+// 			if ( ! $referral = affwp_get_referral( $referral_id ) ) {
+// 				return false;
+//		    }
+//	    }
+
+	    $args['referrals'] = implode( ',', $args['referrals'] );
 
 		$add = $this->insert( $args, 'payout' );
 
