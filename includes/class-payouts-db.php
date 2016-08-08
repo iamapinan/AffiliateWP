@@ -178,7 +178,7 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 	 * @return array Associative array of affiliates to referral IDs where affiliate IDs
 	 *               are the index with a sub-array of corresponding referral IDs.
 	 */
-	public function get_affiliate_ids_by_referral( $referrals ) {
+	public function get_affiliate_ids_by_referrals( $referrals ) {
 		$referrals = array_map( 'affwp_get_referral', $referrals );
 
 		$affiliates = array();
@@ -201,7 +201,7 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 	 *                          referral IDs.
 	 * @return array List of payout IDs for all referrals.
 	 */
-	public function get_payout_ids_by_affiliate( $affiliates ) {
+	public function get_payout_ids_by_affiliates( $affiliates ) {
 		$payout_ids = array();
 
 		foreach ( $affiliates as $affiliate => $referrals ) {
@@ -295,9 +295,9 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 				$args['referrals'] = (array) $args['referrals'];
 			}
 
-			$affiliates = $this->get_affiliate_ids_by_referral( $args['referrals'] );
+			$affiliates = $this->get_affiliate_ids_by_referrals( $args['referrals'] );
 
-			$payout_ids = array_unique( $this->get_payout_ids_by_affiliate( $affiliates ) );
+			$payout_ids = array_unique( $this->get_payout_ids_by_affiliates( $affiliates ) );
 
 			if ( ! empty( $payout_ids ) ) {
 				$payout_ids = implode( ',', $payout_ids );
