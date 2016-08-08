@@ -1074,7 +1074,7 @@ class Affiliate_WP_Settings {
 
 			add_filter( 'affwp_settings_general', function ( $general_settings ) {
 				$general_settings['license_key']['disabled'] = true;
-				$general_settings['license_key']['desc']     = sprintf( __( 'Your license key is globally defined via <code>AFFILIATE_WP_LICENSE_KEY</code> set in <code>wp-config.php</code>.<br />It cannot be modified from this screen.<br />An active license key is needed for automatic plugin updates and <a href="%s" target="_blank">support</a>.', 'affiliate-wp' ), 'https://affiliatewp.com/support/' );
+				$general_settings['license_key']['desc']     = sprintf( __( 'Your license key is globally defined via <code>AFFILIATEWP_LICENSE_KEY</code> set in <code>wp-config.php</code>.<br />It cannot be modified from this screen.<br />An active license key is needed for automatic plugin updates and <a href="%s" target="_blank">support</a>.', 'affiliate-wp' ), 'https://affiliatewp.com/support/' );
 
 				return $general_settings;
 			} );
@@ -1236,7 +1236,7 @@ class Affiliate_WP_Settings {
 	/**
 	 * Retrieves the license key.
 	 *
-	 * If the `AFFILIATE_WP_LICENSE_KEY` constant is defined, it will override values
+	 * If the `AFFILIATEWP_LICENSE_KEY` constant is defined, it will override values
 	 * stored in the database.
 	 *
 	 * @since 1.9
@@ -1248,7 +1248,7 @@ class Affiliate_WP_Settings {
 	 */
 	public static function get_license_key( $key = '' ) {
 		if ( self::global_license_set() ) {
-			$license = AFFILIATE_WP_LICENSE_KEY;
+			$license = AFFILIATEWP_LICENSE_KEY;
 		} elseif ( ! empty( $key ) ) {
 			$license = $key;
 		} else {
@@ -1267,7 +1267,7 @@ class Affiliate_WP_Settings {
 	 * @return bool True if the global license has been defined, otherwise false.
 	 */
 	public static function global_license_set() {
-		if ( defined( 'AFFILIATE_WP_LICENSE_KEY' ) && is_string( AFFILIATE_WP_LICENSE_KEY ) ) {
+		if ( defined( 'AFFILIATEWP_LICENSE_KEY' ) && is_string( AFFILIATEWP_LICENSE_KEY ) ) {
 			return true;
 		}
 		return false;
