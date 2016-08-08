@@ -90,6 +90,72 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 	}
 
 	/**
+	 * Adds a new payout.
+	 *
+	 * @since 1.9
+	 * @access public
+	 *
+	 * @param array $args {
+	 *     Optional. Array of arguments for adding a new payout. Default empty array.
+	 *
+	 *     @type int        $affiliate_id  Affiliate ID the payout should be associated with.
+	 *     @type array      $referrals     Referral ID or array of IDs to associate the payout with.
+	 *     @type float      $amount        Payout amount.
+	 *     @type string     $payout_method Payout method.
+	 *     @type string     $status        Payout status. Will be 'paid' unless there's a problem.
+	 *     @type int|string $date          Date string or timestamp for when the payout was created.
+	 * }
+	 * @return int|false Payout ID if successfully added, otherwise false.
+	 */
+	public function add( $data = array() ) {
+
+		$defaults = array(
+			'affiliate_id' => 0,
+			'referrals'    => array(),
+			'amount'       => 0,
+		);
+
+		$args = wp_parse_args( $data, $defaults );
+
+		if ( ! affiliate_wp()->affiliates->affiliate_exists( $args['affiliate_id'] ) ) {
+			return false;
+		}
+
+		if ( empty( $args['referrals'] ) ) {
+			return false;
+		}
+
+		if ( ! is_array( $args['referrals'] ) ) {
+			$args['referrals'] = (array) $args['referrals'];
+		}
+
+		foreach ( $args['referrals'] as $referral_id ) {
+			if ( ! $referral = affwp_get_referral( $referral_id ) ) {
+				return false;
+			}
+		}
+
+		$args['referrals'] = implode( ',', $args['referrals'] );
+
+		$add = $this->insert( $args, 'payout' );
+
+		if ( $add ) {
+			/**
+			 * Fires immediately after a payout has been successfully inserted.
+			 *
+			 * @since 1.9
+			 *
+			 * @param int $add New payout ID.
+			 */
+			do_action( 'affwp_insert_payout', $add );
+
+			return $add;
+		}
+
+		return false;
+	}
+
+	/**
 	 * Retrieve payouts from the database
 	 *
 	 * @since 1.9
@@ -369,72 +435,6 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 		$payout = $wpdb->query( $wpdb->prepare( "SELECT 1 FROM {$this->table_name} WHERE {$this->primary_key} = %d;", $payout_id ) );
 
 		return ! empty( $payout );
-	}
-
-	/**
-	 * Adds a new payout.
-	 *
-	 * @since 1.9
-	 * @access public
-	 *
-	 * @param array $args {
-	 *     Optional. Array of arguments for adding a new payout. Default empty array.
-	 *
-	 *     @type int        $affiliate_id  Affiliate ID the payout should be associated with.
-	 *     @type array      $referrals     Referral ID or array of IDs to associate the payout with.
-	 *     @type float      $amount        Payout amount.
-	 *     @type string     $payout_method Payout method.
-	 *     @type string     $status        Payout status. Will be 'paid' unless there's a problem.
-	 *     @type int|string $date          Date string or timestamp for when the payout was created.
-	 * }
-	 * @return int|false Payout ID if successfully added, otherwise false.
-	*/
-	public function add( $data = array() ) {
-
-		$defaults = array(
-			'affiliate_id' => 0,
-			'referrals'    => array(),
-			'amount'       => 0,
-		);
-
-		$args = wp_parse_args( $data, $defaults );
-
-		if ( ! affiliate_wp()->affiliates->affiliate_exists( $args['affiliate_id'] ) ) {
-			return false;
-		}
-
-		if ( empty( $args['referrals'] ) ) {
-			return false;
-		}
-
-		if ( ! is_array( $args['referrals'] ) ) {
-			$args['referrals'] = (array) $args['referrals'];
- 		}
-
-		foreach ( $args['referrals'] as $referral_id ) {
-			if ( ! $referral = affwp_get_referral( $referral_id ) ) {
-				return false;
-			}
-		}
-
-	    $args['referrals'] = implode( ',', $args['referrals'] );
-
-		$add = $this->insert( $args, 'payout' );
-
-		if ( $add ) {
-			/**
-			 * Fires immediately after a payout has been successfully inserted.
-			 *
-			 * @since 1.9
-			 *
-			 * @param int $add New payout ID.
-			 */
-			do_action( 'affwp_insert_payout', $add );
-
-			return $add;
-		}
-
-		return false;
 	}
 
 	/**
