@@ -81,8 +81,13 @@ class Payout_Function_Tests extends AffiliateWP_UnitTestCase {
 	 * @covers affwp_get_payout_referrals()
 	 */
 	public function test_get_payout_referrals_should_return_array_of_referral_objects() {
+		$affiliate_id = $this->affwp->affiliate->create();
+
 		$payout_id = $this->affwp->payout->create( array(
-			'referrals' => $referrals = $this->affwp->referral->create_many( 3 )
+			'affiliate_id' => $affiliate_id,
+			'referrals'    => $referrals = $this->affwp->referral->create_many( 3, array(
+				'affiliate_id' => $affiliate_id
+			) )
 		) );
 
 		$payout_referrals = affwp_get_payout_referrals( $payout_id );

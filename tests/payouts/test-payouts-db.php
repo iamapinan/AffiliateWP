@@ -143,8 +143,13 @@ class Payouts_DB_Tests extends AffiliateWP_UnitTestCase {
 	 * @covers Affiliate_WP_Payouts_DB::get_referral_ids()
 	 */
 	public function test_get_referral_ids_should_return_an_array_of_referral_ids() {
+		$affiliate_id = $this->affwp->affiliate->create();
+
 		$payout_id = $this->affwp->payout->create( array(
-			'referrals' => $referrals = $this->affwp->referral->create_many( 3 )
+			'affiliate_id' => $affiliate_id,
+			'referrals'    => $referrals = $this->affwp->referral->create_many( 3, array(
+				'affiliate_id' => $affiliate_id
+			) )
 		) );
 
 		$this->assertEqualSets( $referrals, affiliate_wp()->affiliates->payouts->get_referral_ids( $payout_id ) );
