@@ -6,40 +6,13 @@
  * @group database
  * @group affiliates
  */
-class Affiliate_DB_Tests extends WP_UnitTestCase {
-
-	/**
-	 * Test users.
-	 *
-	 * @access public
-	 * @var array
-	 */
-	public $users = array();
-
-	/**
-	 * Test affiliates.
-	 *
-	 * @access public
-	 * @var array
-	 */
-	public $affiliates = array();
-
-	/**
-	 * Tear down.
-	 */
-	public function tearDown() {
-		// Reset fixtures.
-		$this->users = array();
-		$this->affiliates = array();
-
-		parent::tearDown();
-	}
+class Affiliate_DB_Tests extends AffiliateWP_UnitTestCase {
 
 	/**
 	 * @covers Affiliate_WP_DB_Affiliates::get_affiliates()
 	 */
 	public function test_get_affiliates_should_return_array_of_Affiliate_objects_if_not_count_query() {
-		$this->_set_up_affiliates( 4 );
+		$this->affwp->affiliate->create_many( 4 );
 
 		$results = affiliate_wp()->affiliates->get_affiliates();
 
@@ -51,7 +24,7 @@ class Affiliate_DB_Tests extends WP_UnitTestCase {
 	 * @covers Affiliate_WP_DB_Affiliates::get_affiliates()
 	 */
 	public function test_get_affiliates_should_return_integer_if_count_query() {
-		$this->_set_up_affiliates( 4 );
+		$this->affwp->affiliate->create_many( 4 );
 
 		$results = affiliate_wp()->affiliates->get_affiliates( array(), $count = true );
 
@@ -69,7 +42,7 @@ class Affiliate_DB_Tests extends WP_UnitTestCase {
 		) );
 
 		// Add the affiliate.
-		affiliate_wp()->affiliates->add( array(
+		$this->affwp->affiliate->create( array(
 			'user_id' => $user->ID
 		) );
 
@@ -96,7 +69,7 @@ class Affiliate_DB_Tests extends WP_UnitTestCase {
 		) );
 
 		// Add the affiliate.
-		affiliate_wp()->affiliates->add( array(
+		$this->affwp->affiliate->create( array(
 			'user_id' => $user->ID
 		) );
 
@@ -136,7 +109,7 @@ class Affiliate_DB_Tests extends WP_UnitTestCase {
 
 		// Add affiliates.
 		foreach ( array( $user, $user2, $user3 ) as $id ) {
-			affiliate_wp()->affiliates->add( array(
+			$this->affwp->affiliate->create( array(
 				'user_id' => $id
 			) );
 		}
@@ -166,7 +139,7 @@ class Affiliate_DB_Tests extends WP_UnitTestCase {
 		$user = $this->factory->user->create_and_get();
 
 		// Add the affiliate.
-		$affilite_id = affiliate_wp()->affiliates->add( array(
+		$affilite_id = $this->affwp->affiliate->create( array(
 			'user_id' => $user->ID
 		) );
 
@@ -187,7 +160,7 @@ class Affiliate_DB_Tests extends WP_UnitTestCase {
 
 		// Add affiliates.
 		foreach ( $users as $user_id ) {
-			affiliate_wp()->affiliates->add( array(
+			$this->affwp->affiliate->create( array(
 				'user_id' => $user_id
 			) );
 		}
@@ -211,7 +184,7 @@ class Affiliate_DB_Tests extends WP_UnitTestCase {
 		$user = $this->factory->user->create_and_get();
 
 		// Add the affiliate.
-		$affiliate_id = affiliate_wp()->affiliates->add( array(
+		$affiliate_id = $this->affwp->affiliate->create( array(
 			'user_id' => $user->ID
 		) );
 
@@ -233,12 +206,9 @@ class Affiliate_DB_Tests extends WP_UnitTestCase {
 
 		// Add affiliates.
 		foreach ( $users as $user_id ) {
-			$affiliate_id = affiliate_wp()->affiliates->add( array(
+			$affiliates[] = $this->affwp->affiliate->create( array(
 				'user_id' => $user_id
 			) );
-
-			// Grab affiliates.
-			$affiliates[] = $affiliate_id;
 		}
 
 		// Query affiliates.
@@ -257,25 +227,27 @@ class Affiliate_DB_Tests extends WP_UnitTestCase {
 	 * @covers Affiliate_WP_DB_Affiliates::get_affiliates()
 	 */
 	public function test_get_affiliates_default_orderby_should_order_by_affiliate_id() {
-		$this->_set_up_affiliates( 3 );
+		$affiliates = $this->affwp->affiliate->create_many( 3 );
 
 		$results = affiliate_wp()->affiliates->get_affiliates( array(
 			'order' => 'ASC'
 		) );
 
 		// Order should be as created, 0, 1, 2.
-		$this->assertEquals( $this->affiliates[0], $results[0]->affiliate_id );
-		$this->assertEquals( $this->affiliates[1], $results[1]->affiliate_id );
-		$this->assertEquals( $this->affiliates[2], $results[2]->affiliate_id );
+		$this->assertEquals( $affiliates[0], $results[0]->affiliate_id );
+		$this->assertEquals( $affiliates[1], $results[1]->affiliate_id );
+		$this->assertEquals( $affiliates[2], $results[2]->affiliate_id );
 	}
 
 	/**
 	 * @covers Affiliate_WP_DB_Affiliates::get_affiliates()
 	 */
 	public function test_get_affiliates_orderby_status_should_order_by_status() {
-		$this->_set_up_affiliates( 1, array( 'status' => 'active' ) );
-		$this->_set_up_affiliates( 1, array( 'status' => 'rejected' ) );
-		$this->_set_up_affiliates( 1, array( 'status' => 'inactive' ) );
+		$affiliates = array(
+			$this->affwp->affiliate->create( array( 'status' => 'active' ) ),
+			$this->affwp->affiliate->create( array( 'status' => 'rejected' ) ),
+			$this->affwp->affiliate->create( array( 'status' => 'inactive' ) )
+		);
 
 		$results = affiliate_wp()->affiliates->get_affiliates( array(
 			'orderby' => 'status',
@@ -283,47 +255,45 @@ class Affiliate_DB_Tests extends WP_UnitTestCase {
 		) );
 
 		// Order should be alphabetical: 0 (active), 2 (inactive), 1 (rejected).
-		$this->assertEquals( $this->affiliates[0], $results[0]->affiliate_id );
-		$this->assertEquals( $this->affiliates[2], $results[1]->affiliate_id );
-		$this->assertEquals( $this->affiliates[1], $results[2]->affiliate_id );
+		$this->assertEquals( $affiliates[0], $results[0]->affiliate_id );
+		$this->assertEquals( $affiliates[2], $results[1]->affiliate_id );
+		$this->assertEquals( $affiliates[1], $results[2]->affiliate_id );
 	}
 
 	/**
 	 * @covers Affiliate_WP_DB_Affiliates::get_affiliates()
 	 */
 	public function test_get_affiliates_orderby_date_should_order_by_registered_date() {
-		$this->_set_up_affiliates( 1, array( 'date_registered' => ( time() - WEEK_IN_SECONDS ) ) );
-		$this->_set_up_affiliates( 1, array( 'date_registered' => ( time() + WEEK_IN_SECONDS ) ) );
-		$this->_set_up_affiliates( 1 );
+		$affiliates = array(
+			$this->affwp->affiliate->create( array( 'date_registered' => ( time() - WEEK_IN_SECONDS ) ) ),
+			$this->affwp->affiliate->create( array( 'date_registered' => ( time() + WEEK_IN_SECONDS ) ) ),
+			$this->affwp->affiliate->create()
+		);
 
 		$results = affiliate_wp()->affiliates->get_affiliates( array(
 			'orderby' => 'date', // Default 'order' is DESC
 		) );
 
 		// Order should be newest to oldest: 2, 0, 1.
-		$this->assertEquals( $this->affiliates[2], $results[0]->affiliate_id );
-		$this->assertEquals( $this->affiliates[0], $results[1]->affiliate_id );
-		$this->assertEquals( $this->affiliates[1], $results[2]->affiliate_id );
+		$this->assertEquals( $affiliates[2], $results[0]->affiliate_id );
+		$this->assertEquals( $affiliates[0], $results[1]->affiliate_id );
+		$this->assertEquals( $affiliates[1], $results[2]->affiliate_id );
 	}
 
 	/**
 	 * @covers Affiliate_WP_DB_Affiliates::get_affiliates()
 	 */
 	public function test_get_affiliates_orderby_name_should_order_by_user_display_name() {
-		$this->users[] = $this->factory->user->create( array(
-			'display_name' => 'Bravo'
-		) );
+		$users = array(
+			$this->factory->user->create( array( 'display_name' => 'Bravo' ) ),
+			$this->factory->user->create( array( 'display_name' => 'Alpha' ) ),
+			$this->factory->user->create( array( 'display_name' => 'Charlie' ) )
+		);
 
-		$this->users[] = $this->factory->user->create( array(
-			'display_name' => 'Alpha'
-		) );
+		$affiliates = array();
 
-		$this->users[] = $this->factory->user->create( array(
-			'display_name' => 'Charlie'
-		) );
-
-		foreach ( $this->users as $user_id ) {
-			$this->affiliates[] = affiliate_wp()->affiliates->add( array(
+		foreach ( $users as $user_id ) {
+			$affiliates[] = $this->affwp->affiliate->create( array(
 				'user_id' => $user_id
 			) );
 		}
@@ -333,29 +303,25 @@ class Affiliate_DB_Tests extends WP_UnitTestCase {
 		) );
 
 		// Order should be reverse alphabetical: 2 (Charlie), 0 (Beta), 1 (Alpha).
-		$this->assertEquals( $this->affiliates[2], $results[0]->affiliate_id );
-		$this->assertEquals( $this->affiliates[0], $results[1]->affiliate_id );
-		$this->assertEquals( $this->affiliates[1], $results[2]->affiliate_id );
+		$this->assertEquals( $affiliates[2], $results[0]->affiliate_id );
+		$this->assertEquals( $affiliates[0], $results[1]->affiliate_id );
+		$this->assertEquals( $affiliates[1], $results[2]->affiliate_id );
 	}
 
 	/**
 	 * @covers Affiliate_WP_DB_Affiliates::get_affiliates()
 	 */
 	public function test_get_affiliates_orderby_username_should_order_by_user_login() {
-		$this->users[] = $this->factory->user->create( array(
-			'user_login' => 'delta'
-		) );
+		$users = array(
+			$this->factory->user->create( array( 'user_login' => 'delta' ) ),
+			$this->factory->user->create( array( 'user_login' => 'foxtrot' ) ),
+			$this->factory->user->create( array( 'user_login' => 'echo' ) )
+		);
 
-		$this->users[] = $this->factory->user->create( array(
-			'user_login' => 'foxtrot'
-		) );
+		$affiliates = array();
 
-		$this->users[] = $this->factory->user->create( array(
-			'user_login' => 'echo'
-		) );
-
-		foreach ( $this->users as $user_id ) {
-			$this->affiliates[] = affiliate_wp()->affiliates->add( array(
+		foreach ( $users as $user_id ) {
+			$affiliates[] = $this->affwp->affiliate->create( array(
 				'user_id' => $user_id
 			) );
 		}
@@ -366,36 +332,37 @@ class Affiliate_DB_Tests extends WP_UnitTestCase {
 		) );
 
 		// Order should be 0 (delta), 2 (echo), 1 (foxtrot).
-		$this->assertEquals( $this->affiliates[0], $results[0]->affiliate_id );
-		$this->assertEquals( $this->affiliates[2], $results[1]->affiliate_id );
-		$this->assertEquals( $this->affiliates[1], $results[2]->affiliate_id );
+		$this->assertEquals( $affiliates[0], $results[0]->affiliate_id );
+		$this->assertEquals( $affiliates[2], $results[1]->affiliate_id );
+		$this->assertEquals( $affiliates[1], $results[2]->affiliate_id );
 	}
 
 	/**
 	 * @covers Affiliate_WP_DB_Affiliates::get_affiliates()
 	 */
 	public function test_get_affiliates_orderby_valid_referral_status_should_order_by_that_referral_status_count() {
-		$this->_set_up_affiliates( 3 );
+		$affiliates = $this->affwp->affiliate->create_many( 3 );
+
 		$referrals = array();
 
 		// Add 1 'unpaid' referral for affiliate 1.
-		affiliate_wp()->referrals->add( array(
-			'affiliate_id' => $this->affiliates[0],
+		$this->affwp->referral->create( array(
+			'affiliate_id' => $affiliates[0],
 			'status'       => 'unpaid'
 		) );
 
 		// Add 3 'unpaid' referrals for affiliate 2.
-		for ( $i = 0; $i <= 3; $i++ ) {
-			affiliate_wp()->referrals->add( array(
-				'affiliate_id' => $this->affiliates[1],
+		for ( $i = 0; $i < 3; $i++ ) {
+			$this->affwp->referral->create( array(
+				'affiliate_id' => $affiliates[1],
 				'status'       => 'unpaid'
 			) );
 		}
 
 		// Add 2 'paid' referrals for affiliate 3.
-		for ( $i = 0; $i <= 2; $i++ ) {
-			affiliate_wp()->referrals->add( array(
-				'affiliate_id' => $this->affiliates[2],
+		for ( $i = 0; $i < 2; $i++ ) {
+			$this->affwp->referral->create( array(
+				'affiliate_id' => $affiliates[2],
 				'status'       => 'paid'
 			) );
 		}
@@ -406,36 +373,36 @@ class Affiliate_DB_Tests extends WP_UnitTestCase {
 		) );
 
 		// Order should be 2 (zero unpaid), 0 (1 unpaid), 1 (3 unpaid).
-		$this->assertEquals( $this->affiliates[2], $results[0]->affiliate_id );
-		$this->assertEquals( $this->affiliates[0], $results[1]->affiliate_id );
-		$this->assertEquals( $this->affiliates[1], $results[2]->affiliate_id );
+		$this->assertEquals( $affiliates[2], $results[0]->affiliate_id );
+		$this->assertEquals( $affiliates[0], $results[1]->affiliate_id );
+		$this->assertEquals( $affiliates[1], $results[2]->affiliate_id );
 	}
 
 	/**
 	 * @covers Affiliate_WP_DB_Affiliates::get_affiliates()
 	 */
 	public function test_get_affiliates_orderby_invalid_referral_status_should_default_to_order_by_primary_key() {
-		$this->_set_up_affiliates( 3 );
+		$affiliates = $this->affwp->affiliate->create_many( 3 );
 
 		$results = affiliate_wp()->affiliates->get_affiliates( array(
 			'orderby' => rand_str( 15 )
 		) );
 
 		// With invalid orderby, should return ordered by affiliate_id, descending.
-		$this->assertEquals( $this->affiliates[2], $results[0]->affiliate_id );
-		$this->assertEquals( $this->affiliates[1], $results[1]->affiliate_id );
-		$this->assertEquals( $this->affiliates[0], $results[2]->affiliate_id );
+		$this->assertEquals( $affiliates[2], $results[0]->affiliate_id );
+		$this->assertEquals( $affiliates[1], $results[1]->affiliate_id );
+		$this->assertEquals( $affiliates[0], $results[2]->affiliate_id );
 	}
 
 	/**
 	 * @covers Affiliate_WP_DB_Affiliates::get_affiliates()
 	 */
 	public function test_get_affiliates_orderby_earnings_should_order_by_earnings() {
-		$this->_set_up_affiliates( 3 );
+		$affiliates = $this->affwp->affiliate->create_many( 3 );
 
-		affiliate_wp()->affiliates->update( $this->affiliates[0], array( 'earnings' => '20' ) );
-		affiliate_wp()->affiliates->update( $this->affiliates[1], array( 'earnings' => '10' ) );
-		affiliate_wp()->affiliates->update( $this->affiliates[2], array( 'earnings' => '30' ) );
+		affiliate_wp()->affiliates->update( $affiliates[0], array( 'earnings' => '20' ) );
+		affiliate_wp()->affiliates->update( $affiliates[1], array( 'earnings' => '10' ) );
+		affiliate_wp()->affiliates->update( $affiliates[2], array( 'earnings' => '30' ) );
 
 		$results = affiliate_wp()->affiliates->get_affiliates( array(
 			'orderby' => 'earnings',
@@ -443,27 +410,9 @@ class Affiliate_DB_Tests extends WP_UnitTestCase {
 		) );
 
 		// Order should least to greatest: 1 (10), 0 (20), 2 (30).
-		$this->assertEquals( $this->affiliates[1], $results[0]->affiliate_id );
-		$this->assertEquals( $this->affiliates[0], $results[1]->affiliate_id );
-		$this->assertEquals( $this->affiliates[2], $results[2]->affiliate_id );
+		$this->assertEquals( $affiliates[1], $results[0]->affiliate_id );
+		$this->assertEquals( $affiliates[0], $results[1]->affiliate_id );
+		$this->assertEquals( $affiliates[2], $results[2]->affiliate_id );
 	}
 
-	/**
-	 * Helper to set up user accounts and affiliates.
-	 *
-	 * @since 1.8
-	 * @access public
-	 *
-	 * @param int   $count          Optional. Number of affiliates to create. Default 3.
-	 * @param array $affiliate_args Optional. Arguments for adding affiliates. Default empty array.
-	 */
-	public function _set_up_affiliates( $count = 3, $affiliate_args = array() ) {
-		$this->users = $this->factory->user->create_many( $count );
-
-		foreach ( $this->users as $user_id ) {
-			$args = array_merge( array( 'user_id' => $user_id ), $affiliate_args );
-
-			$this->affiliates[] = affiliate_wp()->affiliates->add( $args );
-		}
-	}
 }
