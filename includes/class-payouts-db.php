@@ -109,6 +109,8 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 	 *         @type float $max Maximum payout amount. Use -1 for no limit.
 	 *     }
 	 *     @type string       $payout_method Payout method to retrieve payouts for.
+	 *     @type int|array    $include       Payout ID or array of IDs to specifically include in the query.
+	 *     @type int|array    $exclude       Payout ID or array of IDs to specifically exclude from the query.
 	 *     @type string|array $date          {
 	 *         Date string or start/end range to retrieve payouts for.
 	 *
@@ -134,6 +136,8 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 			'referrals'     => 0,
 			'amount'        => 0,
 			'payout_method' => '',
+			'include'       => array(),
+			'exclude'       => array(),
 			'status'        => 'paid',
 			'date'          => '',
 			'order'         => 'DESC',
