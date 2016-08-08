@@ -210,7 +210,20 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 			}
 		}
 
-		return $payout_ids;
+		return array_unique( $payout_ids );
+	}
+
+	/**
+	 * Retrieves all payout IDs for a set of referrals, regardless of affiliate association.
+	 *
+	 * @since 1.9
+	 * @access public
+	 *
+	 * @param array $referrals Array of referral IDs.
+	 * @return array Array of payout IDs.
+	 */
+	public function get_payout_ids_by_referrals( $referrals ) {
+		return $this->get_payout_ids_by_affiliates( $this->get_affiliate_ids_by_referrals( $referrals ) );
 	}
 
 	/**
@@ -295,9 +308,7 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 				$args['referrals'] = (array) $args['referrals'];
 			}
 
-			$affiliates = $this->get_affiliate_ids_by_referrals( $args['referrals'] );
-
-			$payout_ids = array_unique( $this->get_payout_ids_by_affiliates( $affiliates ) );
+			$payout_ids = $this->get_payout_ids_by_referrals( $args['referrals'] );
 
 			if ( ! empty( $payout_ids ) ) {
 				$payout_ids = implode( ',', $payout_ids );
