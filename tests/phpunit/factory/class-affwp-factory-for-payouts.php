@@ -48,6 +48,6 @@ class AffWP_Factory_For_Payouts extends WP_UnitTest_Factory_For_Thing {
 	 * @return \AffWP\Affiliate\Payout|false
 	 */
 	function get_object_by_id( $payout_id ) {
-		return affwp_get_referral( $payout_id );
+		return affwp_get_payout( $payout_id );
 	}
 }
