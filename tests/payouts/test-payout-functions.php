@@ -5,7 +5,7 @@
  * @group payouts
  * @group functions
  */
-class Payout_Function_Tests extends WP_UnitTestCase {
+class Payout_Function_Tests extends AffiliateWP_UnitTestCase {
 
 	protected $_payout_id, $_affiliate_id, $_referral_id;
 
@@ -51,7 +51,9 @@ class Payout_Function_Tests extends WP_UnitTestCase {
 	 * @covers affwp_get_payout()
 	 */
 	public function test_get_payout_with_a_valid_payout_id_should_return_a_payout_object() {
-		$this->assertInstanceOf( 'AffWP\Affiliate\Payout', affwp_get_payout( $this->_payout_id ) );
+		$payout_id = $this->affwp->payout->create();
+
+		$this->assertInstanceOf( 'AffWP\Affiliate\Payout', affwp_get_payout( $payout_id ) );
 	}
 
 	/**
@@ -65,7 +67,7 @@ class Payout_Function_Tests extends WP_UnitTestCase {
 	 * @covers affwp_get_payout()
 	 */
 	public function test_get_payout_with_a_valid_payout_object_should_return_a_payout_object() {
-		$payout = affwp_get_payout( $this->_payout_id );
+		$payout = $this->affwp->payout->create_and_get();
 
 		$this->assertInstanceOf( 'AffWP\Affiliate\Payout', affwp_get_payout( $payout ) );
 	}
@@ -88,7 +90,9 @@ class Payout_Function_Tests extends WP_UnitTestCase {
 	 * @covers affwp_delete_payout()
 	 */
 	public function test_delete_payout_should_return_true_if_payout_deleted_successfully() {
-		$this->assertTrue( affwp_delete_payout( $this->_payout_id ) );
+		$payout_id = $this->affwp->payout->create();
+
+		$this->assertTrue( affwp_delete_payout( $payout_id ) );
 	}
 
 	/**
@@ -110,16 +114,8 @@ class Payout_Function_Tests extends WP_UnitTestCase {
 	 * @covers affwp_get_payout_referrals()
 	 */
 	public function test_get_payout_referrals_should_return_array_of_referral_objects() {
-		$referrals = array();
-		for ( $i = 1; $i <= 3; $i++ ) {
-			$referrals[] = affiliate_wp()->referrals->add( array(
-				'affiliate_id' => $this->_affiliate_id
-			) );
-		}
-
-		$payout_id = affiliate_wp()->affiliates->payouts->add( array(
-			'affiliate_id' => $this->_affiliate_id,
-			'referrals'    => $referrals
+		$payout_id = $this->affwp->payout->create( array(
+			'referrals' => $referrals = $this->affwp->referral->create_many( 3 )
 		) );
 
 		$payout_referrals = affwp_get_payout_referrals( $payout_id );
@@ -140,17 +136,17 @@ class Payout_Function_Tests extends WP_UnitTestCase {
 	 * @covers affwp_get_payout_status_label()
 	 */
 	public function test_get_payout_status_label_should_return_paid_status_by_default() {
-		$this->assertSame( 'Paid', affwp_get_payout_status_label( $this->_payout_id ) );
+		$payout_id = $this->affwp->payout->create();
+
+		$this->assertSame( 'Paid', affwp_get_payout_status_label( $payout_id ) );
 	}
 
 	/**
 	 * @covers affwp_get_payout_status_label()
 	 */
 	public function test_get_payout_status_label_should_return_payout_status_label() {
-		$payout_id = affiliate_wp()->affiliates->payouts->add( array(
-			'affiliate_id' => $this->_affiliate_id,
-			'status'       => 'failed',
-			'referrals'    => range( 100, 103 )
+		$payout_id = $this->affwp->payout->create( array(
+			'status' => 'failed',
 		) );
 
 		$this->assertSame( 'Failed', affwp_get_payout_status_label( $payout_id ) );
@@ -160,10 +156,8 @@ class Payout_Function_Tests extends WP_UnitTestCase {
 	 * @covers affwp_get_payout_status_label()
 	 */
 	public function test_get_payout_status_label_should_return_paid_if_invalid_status() {
-		$payout_id = affiliate_wp()->affiliates->payouts->add( array(
-			'affiliate_id' => $this->_affiliate_id,
-			'status'       => 'foo',
-			'referrals'    => range( 50, 55 )
+		$payout_id = $this->affwp->payout->create( array(
+			'status' => 'foo'
 		) );
 
 		$this->assertSame( 'Paid', affwp_get_payout_status_label( $payout_id ) );
