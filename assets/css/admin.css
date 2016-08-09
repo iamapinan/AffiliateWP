@@ -243,6 +243,12 @@ table.affwp_table td a {
 	#affwp-affiliates-filter .column-actions {
 		width: 20%;
 	}
+	#affwp-payouts-filter .column-payout_id {
+		width: 8%;
+	}
+	#affwp-payouts-filter .column-status {
+		width: 10%;
+	}
 }
 
 @media screen and ( min-width: 680px ) {

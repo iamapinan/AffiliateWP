@@ -41,7 +41,7 @@ function affwp_payouts_admin() {
 			 */
 			do_action( 'affwp_payouts_page_top' );
 			?>
-			<form id="affwp-affiliates-filter" method="get" action="<?php echo admin_url( 'admin.php?page=affiliate-wp' ); ?>">
+			<form id="affwp-payouts-filter" method="get" action="<?php echo admin_url( 'admin.php?page=affiliate-wp-payouts' ); ?>">
 				<input type="hidden" name="page" value="affiliate-wp-payouts" />
 
 				<?php $payouts_table->views() ?>
