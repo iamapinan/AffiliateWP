@@ -308,11 +308,7 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 
 			$payout_ids = esc_sql( $payout_ids );
 
-			if ( ! empty( $args['search'] ) ) {
-				$where .= "`payout_id` LIKE '%%" . $payout_ids . "%%' ";
-			} else {
-				$where .= "`payout_id` IN( {$payout_ids} ) ";
-			}
+			$where .= "`payout_id` IN( {$payout_ids} ) ";
 
 			unset( $payout_ids );
 		}
