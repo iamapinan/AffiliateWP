@@ -275,7 +275,7 @@ class AffWP_Payouts_Table extends WP_List_Table {
 	function column_affiliate( $payout ) {
 		$url = add_query_arg( array(
 			'page'         => 'affiliate-wp-affiliates',
-			'action'       => 'edit_affiliate',
+			'action'       => 'view_affiliate',
 			'affiliate_id' => $payout->affiliate_id
 		), admin_url( 'admin.php' ) );
 
@@ -315,7 +315,7 @@ class AffWP_Payouts_Table extends WP_List_Table {
 	public function column_referrals( $payout ) {
 		$referrals = affiliate_wp()->affiliates->payouts->get_referral_ids( $payout );
 		$links     = array();
-		$base      = admin_url( 'admin.php?page=affiliate-wp&affiliate_id=' );
+		$base      = admin_url( 'admin.php?page=affiliate-wp-referrals&action=edit_referral&referral_id=' );
 
 		foreach ( $referrals as $referral_id ) {
 			$links[] = sprintf( '<a href="%1$s">%2$s</a>',
@@ -324,7 +324,7 @@ class AffWP_Payouts_Table extends WP_List_Table {
 			);
 		}
 
-		$value = implode( ',', $links );
+		$value = implode( ', ', $links );
 
 		/**
 		 * Filters the value of the 'Referrals' column in the payouts list table.
