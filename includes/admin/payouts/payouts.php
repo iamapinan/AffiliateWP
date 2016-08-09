@@ -127,7 +127,7 @@ class AffWP_Payouts_Table extends WP_List_Table {
 			'ajax'      => false
 		) );
 
-		$this->get_affiliate_counts();
+		$this->get_payout_counts();
 	}
 
 	/**
@@ -511,6 +511,18 @@ class AffWP_Payouts_Table extends WP_List_Table {
 	}
 
 	/**
+	 * Retrieves the payout counts.
+	 *
+	 * @since 1.9
+	 * @access public
+	 */
+	public function get_payout_counts() {
+		$this->paid_count   = affiliate_wp()->affiliates->payouts->count( array( 'status' => 'paid' ) );
+		$this->failed_count = affiliate_wp()->affiliates->payouts->count( array( 'status' => 'failed' ) );
+		$this->total_count  = $this->paid_count + $this->failed_count;
+	}
+
+	/**
 	 * Retrieves all the data for all the payouts.
 	 *
 	 * @since 1.9
@@ -520,11 +532,10 @@ class AffWP_Payouts_Table extends WP_List_Table {
 	 */
 	public function payouts_data() {
 
-		$page    = isset( $_GET['paged'] )    ? absint( $_GET['paged'] ) : 1;
-		$status  = isset( $_GET['status'] )   ? $_GET['status']          : '';
-		$search  = isset( $_GET['s'] )        ? $_GET['s']               : '';
-		$order   = isset( $_GET['order'] )    ? $_GET['order']           : 'ASC';
-		$orderby = isset( $_GET['orderby'] )  ? $_GET['orderby']         : 'payout_id';
+		$page    = isset( $_GET['paged'] )    ? absint( $_GET['paged'] )          :      1;
+		$status  = isset( $_GET['status'] )   ? sanitize_key( $_GET['status'] )   :     '';
+		$order   = isset( $_GET['order'] )    ? sanitize_key( $_GET['order'] )    : 'DESC';
+		$orderby = isset( $_GET['orderby'] )  ? sanitize_key( $_GET['orderby'] )  : 'payout_id';
 
 		$per_page = $this->get_items_per_page( 'affwp_edit_payouts_per_page', $this->per_page );
 
@@ -532,8 +543,8 @@ class AffWP_Payouts_Table extends WP_List_Table {
 			'number'  => $per_page,
 			'offset'  => $per_page * ( $page - 1 ),
 			'status'  => $status,
-			'orderby' => sanitize_text_field( $orderby ),
-			'order'   => sanitize_text_field( $order )
+			'orderby' => $orderby,
+			'order'   => $order
 		) );
 		return $payouts;
 	}
@@ -566,7 +577,7 @@ class AffWP_Payouts_Table extends WP_List_Table {
 				$total_items = $this->paid_count;
 				break;
 			case 'failed':
-				$total_items = $this->failedcount;
+				$total_items = $this->failed_count;
 				break;
 			case 'any':
 				$total_items = $this->total_count;

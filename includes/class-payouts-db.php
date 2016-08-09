@@ -359,6 +359,22 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 			}
 		}
 
+		// Status.
+		if ( ! empty( $args['status'] ) ) {
+			if ( ! in_array( $args['status'], array( 'paid', 'failed' ), true ) ) {
+				$args['status'] = 'paid';
+			}
+
+			$status = esc_sql( $args['status'] );
+
+			if ( ! empty( $where ) ) {
+				$where .= "AND `status` = '" . $status . "' ";
+			} else {
+				$where .= "WHERE `status` = '" . $status . "' ";
+			}
+		}
+
+		// Date.
 		if( ! empty( $args['date'] ) ) {
 
 			if( is_array( $args['date'] ) ) {
