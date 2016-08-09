@@ -188,6 +188,38 @@ class Payouts_DB_Tests extends AffiliateWP_UnitTestCase {
 	/**
 	 * @covers Affiliate_WP_Payouts_DB::get_payouts()
 	 */
+	public function test_get_payouts_with_single_payout_id_should_return_that_payout() {
+		$single = $this->affwp->payout->create();
+		$this->affwp->payout->create_many( 3 );
+
+		$payouts = affiliate_wp()->affiliates->payouts->get_payouts( array(
+			'payout_id' => $single
+		) );
+
+		$this->assertCount( 1, $payouts );
+		$this->assertSame( $single, $payouts[0]->payout_id );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_payouts()
+	 */
+	public function test_get_payouts_with_multiple_payout_ids_should_return_those_payouts() {
+		$payouts = $this->affwp->payout->create_many( 3 );
+
+		$to_query = array( $payouts[0], $payouts[2] );
+
+		$results = affiliate_wp()->affiliates->payouts->get_payouts( array(
+			'payout_id' => $to_query,
+			'order'     => 'ASC', // Default descending.
+		) );
+
+		$this->assertCount( 2, $results );
+		$this->assertSame( $to_query, wp_list_pluck( $results, 'payout_id' ) );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_payouts()
+	 */
 	public function test_get_payouts_with_single_affiliate_id_should_return_payouts_for_that_affiliate_only() {
 		// Total of 5 payouts, two different affiliates.
 		$this->affwp->payout->create_many( 3 );

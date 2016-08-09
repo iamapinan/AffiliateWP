@@ -42,6 +42,8 @@ function affwp_payouts_admin() {
 			do_action( 'affwp_payouts_page_top' );
 			?>
 			<form id="affwp-payouts-filter" method="get" action="<?php echo admin_url( 'admin.php?page=affiliate-wp-payouts' ); ?>">
+				<?php $payouts_table->search_box( __( 'Search', 'affiliate-wp' ), 'affwp-payouts' ); ?>
+
 				<input type="hidden" name="page" value="affiliate-wp-payouts" />
 
 				<?php $payouts_table->views() ?>
@@ -128,6 +130,34 @@ class AffWP_Payouts_Table extends WP_List_Table {
 		) );
 
 		$this->get_payout_counts();
+	}
+
+	/**
+	 * Displays the search field.
+	 *
+	 * @since 1.9
+	 * @access public
+	 *
+	 * @param string $text     Label for the search box.
+	 * @param string $input_id ID of the search box.
+	 */
+	public function search_box( $text, $input_id ) {
+		if ( empty( $_REQUEST['s'] ) && ! $this->has_items() )
+			return;
+
+		$input_id = $input_id . '-search-input';
+
+		if ( ! empty( $_REQUEST['orderby'] ) )
+			echo '<input type="hidden" name="orderby" value="' . esc_attr( $_REQUEST['orderby'] ) . '" />';
+		if ( ! empty( $_REQUEST['order'] ) )
+			echo '<input type="hidden" name="order" value="' . esc_attr( $_REQUEST['order'] ) . '" />';
+		?>
+		<p class="search-box">
+			<label class="screen-reader-text" for="<?php echo $input_id ?>"><?php echo $text; ?>:</label>
+			<input type="search" id="<?php echo $input_id ?>" name="s" value="<?php _admin_search_query(); ?>" />
+			<?php submit_button( $text, 'button', false, false, array( 'ID' => 'search-submit' ) ); ?>
+		</p>
+		<?php
 	}
 
 	/**
@@ -532,19 +562,60 @@ class AffWP_Payouts_Table extends WP_List_Table {
 	 */
 	public function payouts_data() {
 
-		$page    = isset( $_GET['paged'] )    ? absint( $_GET['paged'] )          :      1;
-		$status  = isset( $_GET['status'] )   ? sanitize_key( $_GET['status'] )   :     '';
-		$order   = isset( $_GET['order'] )    ? sanitize_key( $_GET['order'] )    : 'DESC';
-		$orderby = isset( $_GET['orderby'] )  ? sanitize_key( $_GET['orderby'] )  : 'payout_id';
+		$page    = isset( $_GET['paged'] )   ? absint( $_GET['paged'] )         :           1;
+		$status  = isset( $_GET['status'] )  ? sanitize_key( $_GET['status'] )  :          '';
+		$order   = isset( $_GET['order'] )   ? sanitize_key( $_GET['order'] )   :      'DESC';
+		$orderby = isset( $_GET['orderby'] ) ? sanitize_key( $_GET['orderby'] ) : 'payout_id';
+
+		$is_search = false;
+
+		if ( isset( $_GET['referrals'] ) ) {
+			$referrals = sanitize_text_field( $_GET['referrals'] );
+		} else {
+			$referrals = array();
+		}
+
+		if ( isset( $_GET['affiliate_id'] ) ) {
+			$affiliates = sanitize_text_field( $_GET['affiliate_id'] );
+		} else {
+			$affiliates = '';
+		}
+
+		if( ! empty( $_GET['s'] ) ) {
+
+			$is_search = true;
+
+			$search = sanitize_text_field( $_GET['s'] );
+
+			if( is_numeric( $search ) ) {
+				// This is a payout ID search
+				$payout_id = absint( $search );
+			} elseif ( strpos( $search, 'referral:' ) !== false ) {
+				$referrals = trim( str_replace( 'ref:', '', $search ) );
+				if ( false !== strpos( $referrals, ',' ) ) {
+					$referrals = array_map( 'absint', explode( ',', $referrals ) );
+				}
+			} elseif ( strpos( $search, 'affiliate:' ) !== false ) {
+				$affiliates = absint( trim( str_replace( 'affiliate:', '', $search ) ) );
+				if ( false !== strpos( $affiliates, ',' ) ) {
+					$affiliates = array_map( 'absint', explode( ',', $affiliates ) );
+				}
+			}
+
+		}
 
 		$per_page = $this->get_items_per_page( 'affwp_edit_payouts_per_page', $this->per_page );
 
 		$payouts = affiliate_wp()->affiliates->payouts->get_payouts( array(
-			'number'  => $per_page,
-			'offset'  => $per_page * ( $page - 1 ),
-			'status'  => $status,
-			'orderby' => $orderby,
-			'order'   => $order
+			'number'       => $per_page,
+			'offset'       => $per_page * ( $page - 1 ),
+			'payout_id'    => $payout_id,
+			'referrals'    => $referrals,
+			'affiliate_id' => $affiliates,
+			'status'       => $status,
+			'search'       => $is_search,
+			'orderby'      => $orderby,
+			'order'        => $order
 		) );
 		return $payouts;
 	}

@@ -244,7 +244,8 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 	 *
 	 *     @type int          $number        Number of payouts to query for. Default 20.
 	 *     @type int          $offset        Number of payouts to offset the query for. Default 0.
-	 *     @type int|array    $affiliate_id  Affiliate ID or array of affiliate IDs to retrieve payouts for.
+	 *     @type int|array    $payout_id     Payout ID or array of payout IDs to explicitly retrieve. Default 0.
+	 *     @type int|array    $affiliate_id  Affiliate ID or array of affiliate IDs to retrieve payouts for. Default 0.
 	 *     @type int|array    $referrals     Array of referral IDsReferral ID or array of referral IDs to retrieve payouts for.
 	 *     @type float|array  $amount        {
 	 *         Payout amount to retrieve payouts for or min/max range to retrieve payouts for.
@@ -253,8 +254,6 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 	 *         @type float $max Maximum payout amount. Use -1 for no limit.
 	 *     }
 	 *     @type string       $payout_method Payout method to retrieve payouts for.
-	 *     @type int|array    $include       Payout ID or array of IDs to specifically include in the query.
-	 *     @type int|array    $exclude       Payout ID or array of IDs to specifically exclude from the query.
 	 *     @type string|array $date          {
 	 *         Date string or start/end range to retrieve payouts for.
 	 *
@@ -276,16 +275,16 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 		$defaults = array(
 			'number'        => 20,
 			'offset'        => 0,
+			'payout_id'     => 0,
 			'affiliate_id'  => 0,
 			'referrals'     => 0,
 			'amount'        => 0,
 			'payout_method' => '',
-			'include'       => array(),
-			'exclude'       => array(),
 			'status'        => 'paid',
 			'date'          => '',
 			'order'         => 'DESC',
-			'orderby'       => 'payout_id'
+			'orderby'       => 'payout_id',
+			'search'        => false,
 		);
 
 		$args = wp_parse_args( $args, $defaults );
@@ -294,18 +293,38 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 			$args['number'] = 999999999999;
 		}
 
-		// @todo Handle status.
 		$where = '';
+
+		// Specific payouts.
+		if( ! empty( $args['payout_id'] ) ) {
+
+			if( is_array( $args['payout_id'] ) ) {
+				$payout_ids = implode( ',', array_map( 'intval', $args['payout_id'] ) );
+			} else {
+				$payout_ids = intval( $args['payout_id'] );
+			}
+
+			if ( empty( $where ) ) {
+				$where .= "WHERE `payout_id` IN( {$payout_ids} ) ";
+			} else {
+				$where .= "AND `payout_id` IN( {$payout_ids} ) ";
+			}
+		}
 
 		// Affiliate(s).
 		if ( ! empty( $args['affiliate_id'] ) ) {
+
 			if ( is_array( $args['affiliate_id'] ) ) {
 				$affiliates = implode( ',', array_map( 'intval', $args['affiliate_id'] ) );
 			} else {
 				$affiliates = intval( $args['affiliate_id'] );
 			}
 
-			$where .= "WHERE `affiliate_id` IN( {$affiliates} ) ";
+			if ( empty( $where ) ) {
+				$where .= "WHERE `affiliate_id` IN( {$affiliates} ) ";
+			} else {
+				$where .= "AND `affiliate_id` IN( {$affiliates} ) ";
+			}
 		}
 
 		// Referral ID(s).
