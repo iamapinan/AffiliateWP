@@ -161,6 +161,37 @@ class AffWP_Payouts_Table extends WP_List_Table {
 	}
 
 	/**
+	 * Generates the table navigation above or below the table.
+	 *
+	 * @internal Extended here to disable the (sic) $referer argument in wp_nonce_field().
+	 *
+	 * @since 1.9
+	 * @access protected
+	 *
+	 * @param string $which Which tablenav this is. Accepts either 'top' or 'bottom'.
+	 */
+	protected function display_tablenav( $which ) {
+		if ( 'top' === $which ) {
+			wp_nonce_field( 'bulk-' . $this->_args['plural'], '_wpnonce', false );
+		}
+		?>
+		<div class="tablenav <?php echo esc_attr( $which ); ?>">
+
+			<?php if ( $this->has_items() ): ?>
+				<div class="alignleft actions bulkactions">
+					<?php $this->bulk_actions( $which ); ?>
+				</div>
+			<?php endif;
+			$this->extra_tablenav( $which );
+			$this->pagination( $which );
+			?>
+
+			<br class="clear" />
+		</div>
+		<?php
+	}
+
+	/**
 	 * Retrieves the payout view types.
 	 *
 	 * @since 1.9
