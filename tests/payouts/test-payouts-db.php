@@ -313,4 +313,61 @@ class Payouts_DB_Tests extends AffiliateWP_UnitTestCase {
 
 		$this->assertCount( 2, $payouts );
 	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_payouts()
+	 */
+	public function test_get_payouts_should_default_to_all_statuses() {
+		$payouts = $this->affwp->payout->create_many( 3 );
+
+		$payout_ids = wp_list_pluck( affiliate_wp()->affiliates->payouts->get_payouts(), 'payout_id' );
+
+		$this->assertEqualSets( $payouts, $payout_ids );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_payouts()
+	 */
+	public function test_get_payouts_with_paid_status_should_return_only_paid_status_payouts() {
+		$paid_payouts   = $this->affwp->payout->create_many( 3 );
+		$failed_payouts = $this->affwp->payout->create_many( 3, array(
+			'status' => 'failed'
+		) );
+
+		$payout_ids = wp_list_pluck( affiliate_wp()->affiliates->payouts->get_payouts( array(
+			'status' => 'paid'
+		) ), 'payout_id' );
+
+		$this->assertEqualSets( $paid_payouts, $payout_ids );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_payouts()
+	 */
+	public function test_get_payouts_with_failed_status_should_return_only_failed_status_payouts() {
+		$paid_payouts   = $this->affwp->payout->create_many( 3 );
+		$failed_payouts = $this->affwp->payout->create_many( 3, array(
+			'status' => 'failed'
+		) );
+
+		$payout_ids = wp_list_pluck( affiliate_wp()->affiliates->payouts->get_payouts( array(
+			'status' => 'failed'
+		) ), 'payout_id' );
+
+		$this->assertEqualSets( $failed_payouts, $payout_ids );
+	}
+
+	/**
+	 * @covers Affiliate_WP_Payouts_DB::get_payouts()
+	 */
+	public function test_get_payouts_with_invalid_status_should_default_to_paid_status() {
+		$paid   = $this->affwp->payout->create_many( 3 );
+		$failed = $this->affwp->payout->create_many( 2, array( 'status' => 'failed' ) );
+
+		$payout_ids = wp_list_pluck( affiliate_wp()->affiliates->payouts->get_payouts( array(
+			'status' => 'foo'
+		) ), 'payout_id' );
+
+		$this->assertEqualSets( $paid, $payout_ids );
+	}
 }
