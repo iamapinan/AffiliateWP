@@ -624,23 +624,29 @@ class AffWP_Payouts_Table extends WP_List_Table {
 
 			$search = sanitize_text_field( $_GET['s'] );
 
-			if ( is_numeric( $search ) || preg_match( '/([0-9]+\,[0-9]+)/', $search, $matches ) ) {
+			if ( is_numeric( $search ) || preg_match( '/^([0-9]+\,[0-9]+)$/', $search, $matches ) ) {
 				// Searching for specific payouts.
 				if ( ! empty( $matches[0] ) ) {
+					$is_search  = false;
 					$payout_ids = array_map( 'absint', explode( ',', $search ) );
 				} else {
 					$payout_ids = absint( $search );
 				}
-				$is_search = false;
 			} elseif ( strpos( $search, 'referrals:' ) !== false ) {
-				$referrals = trim( str_replace( 'referrals:', '', $search ) );
+				$referrals = trim( str_replace( array( ' ', 'referrals:' ), '', $search ) );
 				if ( false !== strpos( $referrals, ',' ) ) {
+					$is_search = false;
 					$referrals = array_map( 'absint', explode( ',', $referrals ) );
+				} else {
+					$referrals = absint( $referrals );
 				}
 			} elseif ( strpos( $search, 'affiliate:' ) !== false ) {
-				$affiliates = absint( trim( str_replace( 'affiliate:', '', $search ) ) );
+				$affiliates = trim( str_replace( array( ' ', 'affiliate:' ), '', $search ) );
 				if ( false !== strpos( $affiliates, ',' ) ) {
+					$is_search  = false;
 					$affiliates = array_map( 'absint', explode( ',', $affiliates ) );
+				} else {
+					$affiliates = absint( $affiliates );
 				}
 			}
 
