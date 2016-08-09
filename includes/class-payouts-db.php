@@ -175,18 +175,19 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 	 * @access public
 	 *
 	 * @param array  $referrals Array of referral IDs.
-	 * @param string $status    Optional. Status to skip referrals for. Default 'failed'.
+	 * @param string $status    Optional. Required referral status. Pass an empty string to disable.
+	 *                          Default 'paid'.
 	 * @return array Associative array of affiliates to referral IDs where affiliate IDs
 	 *               are the index with a sub-array of corresponding referral IDs. Referrals
 	 *               with a status other than 'paid' will be skipped.
 	 */
-	public function get_affiliate_ids_by_referrals( $referrals, $status = 'failed' ) {
+	public function get_affiliate_ids_by_referrals( $referrals, $status = 'paid' ) {
 		$referrals = array_map( 'affwp_get_referral', $referrals );
 
 		$affiliates = array();
 
 		foreach ( $referrals as $referral ) {
-			if ( $status === $referral->status ) {
+			if ( ! empty( $status ) && $status !== $referral->status ) {
 				continue;
 			}
 
@@ -228,11 +229,12 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 	 * @access public
 	 *
 	 * @param array  $referrals Array of referral IDs.
-	 * @param string $status    Optional. Status to skip referrals for. Default 'failed'.
+	 * @param string $status    Optional. Required referral status. Pass an empty string to disable.
+	 *                          Default 'paid'.
 	 * @return array Array of payout IDs.
 	 */
-	public function get_payout_ids_by_referrals( $referrals, $skip_status = 'failed' ) {
-		return $this->get_payout_ids_by_affiliates( $this->get_affiliate_ids_by_referrals( $referrals, $skip_status ) );
+	public function get_payout_ids_by_referrals( $referrals, $status = 'paid' ) {
+		return $this->get_payout_ids_by_affiliates( $this->get_affiliate_ids_by_referrals( $referrals, $status ) );
 	}
 
 	/**
