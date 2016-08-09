@@ -176,7 +176,8 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 	 *
 	 * @param array $referrals Array of referral IDs.
 	 * @return array Associative array of affiliates to referral IDs where affiliate IDs
-	 *               are the index with a sub-array of corresponding referral IDs.
+	 *               are the index with a sub-array of corresponding referral IDs. Referrals
+	 *               with a status other than 'paid' will be skipped.
 	 */
 	public function get_affiliate_ids_by_referrals( $referrals ) {
 		$referrals = array_map( 'affwp_get_referral', $referrals );
@@ -184,6 +185,10 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 		$affiliates = array();
 
 		foreach ( $referrals as $referral ) {
+			if ( 'paid' !== $referral->status ) {
+				continue;
+			}
+
 			$affiliates[ $referral->affiliate_id ][] = $referral->ID;
 		}
 
@@ -204,9 +209,11 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 	public function get_payout_ids_by_affiliates( $affiliates ) {
 		$payout_ids = array();
 
-		foreach ( $affiliates as $affiliate => $referrals ) {
-			foreach ( $referrals as $referral ) {
-				$payout_ids[] = affiliate_wp()->referrals->get_column( 'payout_id', $referral );
+		if ( ! empty( $affiliates ) ) {
+			foreach ( $affiliates as $affiliate => $referrals ) {
+				foreach ( $referrals as $referral ) {
+					$payout_ids[] = (int) affiliate_wp()->referrals->get_column( 'payout_id', $referral );
+				}
 			}
 		}
 
