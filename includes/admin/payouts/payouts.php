@@ -46,8 +46,8 @@ function affwp_payouts_admin() {
 
 				<input type="hidden" name="page" value="affiliate-wp-payouts" />
 
-				<?php $payouts_table->views() ?>
-				<?php $payouts_table->display() ?>
+				<?php $payouts_table->views(); ?>
+				<?php $payouts_table->display(); ?>
 			</form>
 			<?php
 			/**
@@ -99,18 +99,29 @@ class AffWP_Payouts_Table extends WP_List_Table {
 	/**
 	 * Number of 'paid' payouts found.
 	 *
+	 * @since 1.9
+	 * @access public
 	 * @var string
-	 * @since 1.0
 	 */
 	public $paid_count;
 
 	/**
-	 *  Number of 'failed' payouts found
+	 * Number of 'failed' payouts found
 	 *
+	 * @since 1.9
+	 * @access public
 	 * @var string
-	 * @since 1.0
 	 */
 	public $failed_count;
+
+	/**
+	 * Optional arguments to pass when preparing items.
+	 *
+	 * @since 1.9
+	 * @access public
+	 * @var array
+	 */
+	public $payout_args = array();
 
 	/**
 	 * Payouts table constructor.
@@ -120,14 +131,22 @@ class AffWP_Payouts_Table extends WP_List_Table {
 	 *
 	 * @see WP_List_Table::__construct()
 	 */
-	public function __construct() {
+	public function __construct( $args = array() ) {
 		global $status, $page;
 
-		parent::__construct( array(
+		if ( ! empty( $args['payout_args'] ) ) {
+			$this->payout_args = $args['payout_args'];
+
+			unset( $args['payout_args'] );
+		}
+
+		$args = wp_parse_args( $args, array(
 			'singular'  => 'payout',
 			'plural'    => 'payouts',
-			'ajax'      => false
+			'ajax'      => false,
 		) );
+
+		parent::__construct( $args );
 
 		$this->get_payout_counts();
 	}
@@ -578,8 +597,14 @@ class AffWP_Payouts_Table extends WP_List_Table {
 	 * @access public
 	 */
 	public function get_payout_counts() {
-		$this->paid_count   = affiliate_wp()->affiliates->payouts->count( array( 'status' => 'paid' ) );
-		$this->failed_count = affiliate_wp()->affiliates->payouts->count( array( 'status' => 'failed' ) );
+		$this->paid_count = affiliate_wp()->affiliates->payouts->count(
+			array_merge( $this->payout_args, array( 'status' => 'paid' ) )
+		);
+
+		$this->failed_count = affiliate_wp()->affiliates->payouts->count(
+			array_merge( $this->payout_args, array( 'status' => 'failed' ) )
+		);
+
 		$this->total_count  = $this->paid_count + $this->failed_count;
 	}
 
@@ -654,7 +679,7 @@ class AffWP_Payouts_Table extends WP_List_Table {
 
 		$per_page = $this->get_items_per_page( 'affwp_edit_payouts_per_page', $this->per_page );
 
-		$payouts = affiliate_wp()->affiliates->payouts->get_payouts( array(
+		$args = wp_parse_args( $this->payout_args, array(
 			'number'       => $per_page,
 			'offset'       => $per_page * ( $page - 1 ),
 			'payout_id'    => $payout_ids,
@@ -665,6 +690,8 @@ class AffWP_Payouts_Table extends WP_List_Table {
 			'orderby'      => $orderby,
 			'order'        => $order
 		) );
+
+		$payouts = affiliate_wp()->affiliates->payouts->get_payouts( $args );
 		return $payouts;
 	}
 
