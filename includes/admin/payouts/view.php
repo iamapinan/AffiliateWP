@@ -99,7 +99,7 @@ $payout = affwp_get_payout( absint( $_GET['payout_id'] ) );
 			</th>
 
 			<td>
-				<?php echo esc_html( $payout->payout_method ); ?>
+				<?php echo empty( $payout->payout_method ) ? __( '(none)', 'affiliate-wp' ) : esc_html( $payout->payout_method ); ?>
 			</td>
 
 		</tr>

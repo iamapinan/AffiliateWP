@@ -408,7 +408,7 @@ class AffWP_Payouts_Table extends WP_List_Table {
 	 * @return string Payout method.
 	 */
 	public function column_payout_method( $payout ) {
-		$value = esc_html( $payout->payout_method );
+		$value = empty( $payout->payout_method ) ? __( '(none)', 'affiliate-wp' ) : esc_html( $payout->payout_method );
 
 		/**
 		 * Filters the value of the 'Payout Method' column in the payouts list table.
