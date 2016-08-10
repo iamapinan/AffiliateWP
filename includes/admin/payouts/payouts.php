@@ -624,7 +624,7 @@ class AffWP_Payouts_Table extends WP_List_Table {
 
 			$search = sanitize_text_field( $_GET['s'] );
 
-			if ( is_numeric( $search ) || preg_match( '/^([0-9]+\,[0-9]+)$/', $search, $matches ) ) {
+			if ( is_numeric( $search ) || preg_match( '/^([0-9]+\,[0-9]+)/', $search, $matches ) ) {
 				// Searching for specific payouts.
 				if ( ! empty( $matches[0] ) ) {
 					$is_search  = false;
