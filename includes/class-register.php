@@ -111,7 +111,7 @@ class Affiliate_WP_Register {
 			// Loop through required fields and show error message
 			foreach ( $this->required_fields() as $field_name => $value ) {
 
-				if( ! empty( $value['logged_out'] ) ) {
+				if ( ! empty( $value['logged_out'] ) ) {
 					continue;
 				}
 
@@ -228,19 +228,22 @@ class Affiliate_WP_Register {
 
 		$status = affiliate_wp()->settings->get( 'require_approval' ) ? 'pending' : 'active';
 
-		if ( ! is_user_logged_in() ) {
-
+		if ( $_POST['affwp_user_name'] ) {
 			$name       = explode( ' ', sanitize_text_field( $_POST['affwp_user_name'] ) );
 			$user_first = $name[0];
 			$user_last  = isset( $name[1] ) ? $name[1] : '';
+		} else {
+			$user_first = '';
+			$user_last  = '';
+		}
+
+		if ( ! is_user_logged_in() ) {
 
 			$args = array(
 				'user_login'    => sanitize_text_field( $_POST['affwp_user_login'] ),
 				'user_email'    => sanitize_text_field( $_POST['affwp_user_email'] ),
 				'user_pass'     => sanitize_text_field( $_POST['affwp_user_pass'] ),
-				'display_name'  => $user_first . ' ' . $user_last,
-				'first_name'    => $user_first,
-				'last_name'     => $user_last
+				'display_name'  => $user_first . ' ' . $user_last
 			);
 
 			$user_id = wp_insert_user( $args );
@@ -252,6 +255,9 @@ class Affiliate_WP_Register {
 			$args    = (array) $user['data'];
 
 		}
+
+		// update first and last name
+		wp_update_user( array( 'ID' => $user_id, 'first_name' => $user_first, 'last_name' => $user_last ) );
 
 		// promotion method
 		$promotion_method = isset( $_POST['affwp_promotion_method'] ) ? sanitize_text_field( $_POST['affwp_promotion_method'] ) : '';
