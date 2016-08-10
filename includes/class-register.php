@@ -228,7 +228,7 @@ class Affiliate_WP_Register {
 
 		$status = affiliate_wp()->settings->get( 'require_approval' ) ? 'pending' : 'active';
 
-		if ( $_POST['affwp_user_name'] ) {
+		if ( ! empty( $_POST['affwp_user_name'] ) ) {
 			$name       = explode( ' ', sanitize_text_field( $_POST['affwp_user_name'] ) );
 			$user_first = $name[0];
 			$user_last  = isset( $name[1] ) ? $name[1] : '';
