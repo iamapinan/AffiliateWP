@@ -597,18 +597,23 @@ class Affiliate_WP_Settings {
 			'misc' => apply_filters( 'affwp_settings_misc',
 				array(
 					'allow_affiliate_registration' => array(
-						'name' => __( 'Allow affiliate registration', 'affiliate-wp' ),
+						'name' => __( 'Allow Affiliate Registration', 'affiliate-wp' ),
 						'desc' => __( 'Should affiliates be able to register accounts for themselves?', 'affiliate-wp' ),
 						'type' => 'checkbox'
 					),
 					'require_approval' => array(
-						'name' => __( 'Require approval', 'affiliate-wp' ),
+						'name' => __( 'Require Approval', 'affiliate-wp' ),
 						'desc' => __( 'Require that site admins approve affiliates before they can begin earning referrals?', 'affiliate-wp' ),
 						'type' => 'checkbox'
 					),
 					'auto_register' => array(
 						'name' => __( 'Auto Register New Users', 'affiliate-wp' ),
 						'desc' => __( 'Automatically register new users as affiliates?', 'affiliate-wp' ),
+						'type' => 'checkbox'
+					),
+					'logout_link' => array(
+						'name' => __( 'Logout Link', 'affiliate-wp' ),
+						'desc' => __( 'Add a logout link to the Affiliate Area.', 'affiliate-wp' ),
 						'type' => 'checkbox'
 					),
 					'default_referral_url' => array(
