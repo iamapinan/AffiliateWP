@@ -330,11 +330,7 @@ class Affiliate_WP_Payouts_DB extends Affiliate_WP_DB {
 
 			$affiliates = esc_sql( $affiliates );
 
-			if ( ! empty( $args['search'] ) ) {
-				$where .= "`affiliate_id` LIKE '%%" . $affiliates . "%%' ";
-			} else {
-				$where .= "`affiliate_id` IN( {$affiliates} ) ";
-			}
+			$where .= "`affiliate_id` IN( {$affiliates} ) ";
 		}
 
 		// Referral ID(s).
